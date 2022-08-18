@@ -15,6 +15,8 @@ class Direction(IntEnum):
 
 
 Weight = int
+
+
 """
 Weight of a given path (received from the server)
 
