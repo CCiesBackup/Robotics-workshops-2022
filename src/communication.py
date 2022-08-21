@@ -21,15 +21,22 @@ class Communication:
         """
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
+        self.logger = logger
         self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
         self.client.on_message = self.safe_on_message_handler
         # Add your client setup here
+        self.client.username_pw_set('202', password='psguk8hU7n')
+        self.client.connect('mothership.inf.tu-dresden.de', port=8883)
+        self.client.subscribe('explorer/202', qos=2)
+        self.client.loop_start()
 
-        self.logger = logger
 
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
         """
+
+        planetname = data[0]
+        "pathSelected"
         Handles the callback if any message arrived
         :param client: paho.mqtt.client.Client
         :param data: Object
@@ -49,7 +56,7 @@ class Communication:
     def send_message(self, topic, message):
         """
         Sends given message to specified channel
-        :param topic: String
+        :param top: String
         :param message: Object
         :return: void
         """
@@ -63,6 +70,20 @@ class Communication:
     #
     # This helper method encapsulated the original "on_message" method and handles
     # exceptions thrown by threads spawned by "paho-mqtt"
+
+    def send_ready(self) -> (str, int, int, int):
+        self.send_message('explorer/202', "ready")
+
+        planetname = ""
+        startX = 0
+        startY = 0
+        direction = 0
+
+
+        return planetname, startX, startY, direction
+
+
+
     def safe_on_message_handler(self, client, data, message):
         """
         Handle exceptions thrown by the paho library

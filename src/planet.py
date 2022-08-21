@@ -4,6 +4,8 @@
 from enum import IntEnum, unique
 from typing import Optional, List, Tuple, Dict
 
+import ShortestPathAbstract
+
 
 @unique
 class Direction(IntEnum):
@@ -32,6 +34,7 @@ class Planet:
     __paths = Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]
 
     def __init__(self):
+        self.shortest_path_algorithm = ShortestPathAbstract.DijkstraAlgorithm()
         self.__paths = {}
 
     def add_path(self,
@@ -58,8 +61,7 @@ class Planet:
                           dictionary: Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]):
         self.__paths[value] = dictionary
 
-    def __get_dict_paths(self, value: Tuple[int, int]) -> \
-        Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]:
+    def __get_dict_paths(self, value: Tuple[int, int]):
             if value in self.__paths:
                 return self.__paths[value], False
             else:
@@ -76,9 +78,16 @@ class Planet:
         return self.__paths
 
 
+    def set_SPath_algorithm(self, algorithm: ShortestPathAbstract):
+        self.shortest_path_algorithm = algorithm
 
-    def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> Optional[List[Tuple[Tuple[int, int], Direction]]]:
+
+    def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> \
+            Optional[List[Tuple[Tuple[int, int], Direction]]]:
+
+        shortest_path = \
+            self.shortest_path_algorithm.find_shortest_path(start, target, self.__paths)
 
 
+        return Optional[shortest_path]
 
-        pass
