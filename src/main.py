@@ -39,6 +39,8 @@ def run():
 
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
+    test = Odometry()
+    test.linefollowing()
 
     print("Hello World!")
 
