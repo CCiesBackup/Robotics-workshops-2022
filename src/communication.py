@@ -50,26 +50,24 @@ class Communication:
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
         type = payload[0]["type"]
-        if type == "ready":
-            self.process_ready_payload(payload)
-        if type =="testPlanet":
-            self.process_testPlanet_payload(payload)
+        if type == "planet":
+            self.process_planet_ready_payload(payload[0])
+        if type =="notice":
+            self.process_testPlanet_payload(payload[0])
         if type == "path":
-            self.process_path_payload(payload)
+            self.process_path_payload(payload[0])
         if type == "pathSelect":
-            self.process_pathSelect_payload(payload)
+            self.process_pathSelect_payload(payload[0])
         if type == "pathUnveiled":
-            self.process_pathUnveiled_payload(payload)
-        if type == "pathUnveiled":
-            self.process_pathUnveiled_payload(payload)
+            self.process_pathUnveiled_payload(payload[0])
         if type == "target":
-            self.process_target_payload(payload)
+            self.process_target_payload(payload[0])
         if type == "targetReached":
-            self.process_targetReached_payload(payload)
+            self.process_done_payload(payload[0])
         if type == "done":
-            self.process_done_payload(payload)
+            self.process_done_payload(payload[0])
         if type == "syntax":
-            self.process_syntax_payload(payload)
+            self.process_syntax_payload(payload[0])
         # YOUR CODE FOLLOWS (remove pass, please!)
 
 
@@ -133,19 +131,24 @@ class Communication:
 
     def process_planet_ready_payload(self, payload):
         local_payload = payload["payload"]
-        self.topics['planet'] = local_payload[]
+        self.topics['planet'] = "planet/" + local_payload["payload"]["planetName"] + "/202"
+        self.client.subscribe(self.topics['planet'], qos=2)
 
-    def process_path_correction_payload(self, payload):
+
+    def process_path_payload(self, payload):
         pass
 
-    def process_path_select_payload(self, payload):
+    def process_pathSelect_payload(self, payload):
         pass
 
-    def process_path_unveiled_payload(self, payload):
+    def process_pathUnveiled_payload(self, payload):
         pass
 
-    def process_completed_payload(self, payload):
+    def process_done_payload(self, payload):
         pass
 
     def process_unknown_payload(self, payload):
+        pass
+
+    def process_syntax_payload(self, payload):
         pass
