@@ -38,17 +38,19 @@ class Communication:
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
         """
-
-        planetname = data[0]
-        "pathSelected"
         Handles the callback if any message arrived
         :param client: paho.mqtt.client.Client
-        :param data: Object
         :param message: Object
         :return: void
         """
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
+        type = payload[0]["type"]
+        if type == "target":
+            self.process_target_payload(payload)
+        if type == "ready":
+            self.process_ready_payload(payload)
+
 
         # YOUR CODE FOLLOWS (remove pass, please!)
         pass
@@ -58,17 +60,12 @@ class Communication:
     # In order to keep the logging working you must provide a topic string and
     # an already encoded JSON-Object as message.
     def send_message(self, topic, message):
-        """
-        Sends given message to specified channel
-        :param top: String
-        :param message: Object
-        :return: void
-        """
         self.logger.debug('Send to: ' + topic)
         self.logger.debug(json.dumps(message, indent=2))
+        encoded_message = json.dumps(message).encode('utf-8')
+        self.client.publish(topic, payload=encoded_message, qos=2, retain=False)
 
-        # YOUR CODE FOLLOWS (remove pass, please!)
-        pass
+
 
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY
     #
@@ -77,6 +74,7 @@ class Communication:
 
     def send_ready(self):
         self.send_message(self.topics['general'], self.msg_models.ready())
+
 
     def send_test_planet(self, planet_name):
         self.send_message(self.topics['general'], self.msg_models.test_planet(planet_name))
@@ -87,11 +85,13 @@ class Communication:
 
     def send_path_select(self,startX, startY, startD):
         self.send_message(self.topics['planet'], self.msg_models.path_select(startX, startY, startD))
+
     def send_target_reached(self,text):
         self.send_message(self.topic['general'], self.msg_models.target_reached(text))
 
     def send_exploration_completed(self,text):
         self.send_message(self.topics['general'], self.msg_models.exploration_completed(text))
+
     def safe_on_message_handler(self, client, data, message):
         """
         Handle exceptions thrown by the paho library
@@ -101,12 +101,33 @@ class Communication:
         :return: void
         """
         try:
-            self.on_message(client, data, message)
+            self.on_message(client, data, message):
         except:
             import traceback
             traceback.print_exc()
             raise
 
+    def process_target_payload(self, payload):
+        pass
 
-class Message:
-    pass
+    def process_testPlanet_payload(self, payload):
+        pass
+
+    def process_planet_ready_payload(self, payload):
+        local_payload = payload["payload"]
+        self.topics['planet'] = local_payload[]
+
+    def process_path_correction_payload(self, payload):
+        pass
+
+    def process_path_select_payload(self, payload):
+        pass
+
+    def process_path_unveiled_payload(self, payload):
+        pass
+
+    def process_completed_payload(self, payload):
+        pass
+
+    def process_unknown_payload(self, payload):
+        pass
