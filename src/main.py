@@ -46,18 +46,17 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-    # internet_explorer = com.CommunicationExplorationInterface(client, logger)
 
-
+    # communication = CommunicationFactory.getInstance(logger)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
 
     # while loop mit Austauschbaren Verhalten
     test = Odometry()
-    while True:
-        test.linefollowing()
+    test.driving()
         
 
+    print("RIP")
 
 
 # DO NOT EDIT
