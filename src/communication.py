@@ -6,6 +6,7 @@ import ssl
 from typing import Tuple
 
 from MessageModelManager import OutgoingMessages
+from MessageProcessingException import MessageProcessingException
 
 
 class Communication:
@@ -159,13 +160,21 @@ class Communication:
         self.explorer.set_path_select(payload["payload"]["startDirection"])
 
     def process_pathUnveiled_payload(self, payload):
-        pass
+        self.process_path_payload(payload)
 
     def process_done_payload(self, payload):
-        pass
+        if payload["type"] == "done":
+            self.client.disconnect()
+            print("成功")
+
+        else:
+            self.explorer.rebuke()
 
     def process_unknown_payload(self, payload):
-        pass
+        print(f" payload of type: {payload['type']} received - processing mismatch! ")
+        # throw new MessageProcessingException();
+        raise MessageProcessingException()
 
     def process_syntax_payload(self, payload):
-        pass
+        for string in payload["payload"].values():
+            print(string)

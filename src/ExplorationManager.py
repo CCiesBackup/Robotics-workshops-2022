@@ -51,6 +51,9 @@ class ExplorationManager:
         self.path_select_set = True
         self.path_select_dir = direction
 
+    def rebuke(self):
+        pass
+
     def add_path_intern(self,
                         start: Tuple[Tuple[int, int], int],
                         target: Tuple[Tuple[int, int], int],
