@@ -38,22 +38,40 @@ class Communication:
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
         """
+
+        planetname = data[0]
+        "pathSelected"
         Handles the callback if any message arrived
         :param client: paho.mqtt.client.Client
+        :param data: Object
         :param message: Object
         :return: void
         """
         payload = json.loads(message.payload.decode('utf-8'))
         self.logger.debug(json.dumps(payload, indent=2))
         type = payload[0]["type"]
-        if type == "target":
-            self.process_target_payload(payload)
         if type == "ready":
             self.process_ready_payload(payload)
-
-
+        if type =="testPlanet":
+            self.process_testPlanet_payload(payload)
+        if type == "path":
+            self.process_path_payload(payload)
+        if type == "pathSelect":
+            self.process_pathSelect_payload(payload)
+        if type == "pathUnveiled":
+            self.process_pathUnveiled_payload(payload)
+        if type == "pathUnveiled":
+            self.process_pathUnveiled_payload(payload)
+        if type == "target":
+            self.process_target_payload(payload)
+        if type == "targetReached":
+            self.process_targetReached_payload(payload)
+        if type == "done":
+            self.process_done_payload(payload)
+        if type == "syntax":
+            self.process_syntax_payload(payload)
         # YOUR CODE FOLLOWS (remove pass, please!)
-        pass
+
 
     # DO NOT EDIT THE METHOD SIGNATURE
     #
@@ -101,7 +119,7 @@ class Communication:
         :return: void
         """
         try:
-            self.on_message(client, data, message):
+            self.on_message(client, data, message)
         except:
             import traceback
             traceback.print_exc()
