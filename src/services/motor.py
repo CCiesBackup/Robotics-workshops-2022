@@ -8,47 +8,54 @@ class Motor(object):
     sleepTimer = 3
     # seven = -286
     seven = -310
+    left = ev3.LargeMotor("outA")
+    right = ev3.LargeMotor("outD")
     
     def __init__(self):
-        """
-        Initializes odometry module
-        """
+        
+        self.left.reset()
+        self.right.reset()
+        
+        self.left.stop_action = "brake"
+        self.right.stop_action = "brake"
+        
+        self.setCommand("run-forever")
     
-    def driveSevenCM(self, left, right):
+    def driveSevenCM(self):
         print('Fahre 7cm')
-        left.position_sp = self.seven
-        right.position_sp = self.seven
+        self.left.position_sp = self.seven
+        self.right.position_sp = self.seven
         
-        self.setspeed(left, right, self.tp, self.tp)
+        self.setspeed(self.tp, self.tp)
         
-        self.setCommand(left, right, "run-to-rel-pos")
+        self.setCommand("run-to-rel-pos")
         
         time.sleep(self.sleepTimer)
     
-    def turnRight(self, left, right):
+    def turnRight(self):
         print('Drehe nach rechts')
-        left.position_sp = -450
-        right.position_sp = 450
+        self.left.position_sp = -450
+        self.right.position_sp = 450
         
-        self.setspeed(left, right, self.tp, -(self.tp))
+        self.setspeed(self.tp, -(self.tp))
         
-        self.setCommand(left, right, "run-to-rel-pos")
+        self.setCommand("run-to-rel-pos")
         
-    def setCommand(self, left, right, command):
-        left.command = command
-        right.command = command
+    def setCommand(self, command):
+        self.left.command = command
+        self.right.command = command
     
-    def setspeed(self, left, right, powerA, powerB):
-        left.speed_sp = -powerA
-        right.speed_sp = -powerB
+    def setspeed(self, powerA, powerB):
+        self.left.speed_sp = -powerA
+        self.right.speed_sp = -powerB
         return
     
-    def driveLine(self, powerLevel, left, right):
+    def driveLine(self, powerLevel):
         powerA = self.tp - powerLevel
         powerD = self.tp + powerLevel
         
-        left.speed_sp = -(powerA)
-        right.speed_sp = -(powerD)
+        self.left.speed_sp = -(powerA)
+        self.right.speed_sp = -(powerD)
 
-        self.setCommand(left, right, "run-forever")
+        self.setCommand("run-forever")
         return

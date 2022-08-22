@@ -16,13 +16,12 @@ import time
 
 class Odometry:
     colorArray = []
-    motor = Motor()
     farbsensor = Farbsensor()
     left = ev3.LargeMotor("outA")
     right = ev3.LargeMotor("outD")
+    motor = Motor()
     kp = 600
     offset = 0.5
-    cs = ev3.ColorSensor()
     error = 0
     turn = 0
     paths = dict(east = False, south = True, west = False, north = False)
@@ -36,16 +35,7 @@ class Odometry:
     # derivative = 0
     
     def __init__(self):
-        self.left.reset()
-        self.right.reset()
-        
-        self.left.stop_action = "brake"
-        self.right.stop_action = "brake"
-        
-        self.left.command = "run-forever"
-        self.right.command = "run-forever"
-        
-        self.cs.mode = "RGB-RAW"
+        'return'
 
     def direction(self):
         alpha = 0
@@ -82,7 +72,7 @@ class Odometry:
                 
     def findPath(self):
         for index in range(0,4):
-            self.motor.turnRight(self.left,self.right)
+            self.motor.turnRight()
             while self.left.is_running:
                 if self.farbsensor.isBlack():
                     self.paths[self.directives[index]] = True
@@ -91,13 +81,13 @@ class Odometry:
         return
     
     def turnAround(self):
-        self.motor.turnRight(self.left,self.right)
-        self.motor.turnRight(self.left,self.right)
+        self.motor.turnRight()
+        self.motor.turnRight()
         
     def driveAtPoint(self):
-        self.motor.driveLine(-(self.turn), self.left, self.right)
-        self.motor.driveLine(-(self.turn), self.left, self.right)
-        self.motor.driveSevenCM(self.left,self.right)
+        self.motor.driveLine(-(self.turn))
+        self.motor.driveLine(-(self.turn))
+        self.motor.driveSevenCM()
         self.findPath()
     
     def driveLine(self, lightValue):
@@ -106,5 +96,5 @@ class Odometry:
         # self.derivative = error - self.lastError
         # turn = error * self.kp + self.ki * self.integral + self.kd * self.derivative
         self.turn = self.error * self.kp
-        self.motor.driveLine(self.turn, self.left, self.right)
+        self.motor.driveLine(self.turn)
         # self.lastError = error
