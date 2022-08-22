@@ -11,7 +11,7 @@ class OutgoingMessages:
                     "from": "client",
                     "type": "testPlanet",
                     "payload": {
-                    "planetName": f"{test_planet_name}"
+                        "planetName": f"{test_planet_name}"
                                 }
                                             }
         return message

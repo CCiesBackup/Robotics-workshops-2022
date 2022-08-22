@@ -43,15 +43,17 @@ def run():
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
     # explorer = ExplorationManager()
-    # communication = CommunicationFactory.getInstance(logger, explorer)
+    # communication = CommunicationFactory.getInstance(client, logger, explorer)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
+    # communication.send_test_planet("Reichstag")
 
 
     test = Odometry()
     test.linefollowing()
 
-    print("Hello World!")
+    print("Hello world! I didn't crash until now!")
+    # communication.send_ready()
 
 
 # DO NOT EDIT

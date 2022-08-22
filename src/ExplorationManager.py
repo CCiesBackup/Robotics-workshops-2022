@@ -17,7 +17,7 @@ class ExplorationManager:
     target = None
     target_set = False
     unknown_paths = {}
-    current_position = Tuple[0, 0]
+    current_position = (0, 0)
     current_orientation = 0
 
     def __init__(self):
