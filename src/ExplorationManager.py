@@ -17,6 +17,7 @@ class ExplorationManager:
     unknown_paths = {}
     current_position = Tuple[0, 0]
 
+
     def __init__(self):
         self.shortest_path = None
         self.planet = Planet()

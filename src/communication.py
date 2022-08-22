@@ -106,7 +106,7 @@ class Communication:
         self.send_message(self.topics['planet'], self.msg_models.path_select(startX, startY, startD))
 
     def send_target_reached(self,text):
-        self.send_message(self.topic['general'], self.msg_models.target_reached(text))
+        self.send_message(self.topics['general'], self.msg_models.target_reached(text))
 
     def send_exploration_completed(self,text):
         self.send_message(self.topics['general'], self.msg_models.exploration_completed(text))
@@ -143,13 +143,21 @@ class Communication:
 
 
     def process_path_payload(self, payload):
-        pass
+        start_x = payload["payload"]["startX"]
+        start_y = payload["payload"]["startY"]
+        start_direction = payload["payload"]["startDirection"]
+        end_x = payload["payload"]["endX"]
+        end_y = payload["payload"]["endY"]
+        end_direction =["payload"]["endDirection"]
+        start = Tuple[start_x, start_y, start_direction]
+        end = Tuple[end_x, end_y, end_direction]
+
 
     def process_pathSelect_payload(self, payload):
-        pass
+        if payload["payload"]["StartDirection"] != self.explorer.get_directions:
 
     def process_pathUnveiled_payload(self, payload):
-        pass
+
 
     def process_done_payload(self, payload):
         pass
