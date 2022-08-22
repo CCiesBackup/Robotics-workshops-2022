@@ -11,3 +11,5 @@ class CommunicationFactory:
         client = mqtt.Client(client_id="202", clean_session=False, protocol=mqtt.MQTTv31)
 
         return communication.Communication(client, logger)
+
+    

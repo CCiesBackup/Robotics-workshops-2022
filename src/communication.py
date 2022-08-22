@@ -4,6 +4,8 @@
 import json
 import ssl
 
+from MessageModelManager import OutgoingMessages
+
 
 class Communication:
     """
@@ -27,8 +29,10 @@ class Communication:
         # Add your client setup here
         self.client.username_pw_set('202', password='psguk8hU7n')
         self.client.connect('mothership.inf.tu-dresden.de', port=8883)
-        self.client.subscribe('explorer/202', qos=2)
+        self.topics = {'general': 'explorer/202', 'planet': "", 'tests': 'comtest/202'}
         self.client.loop_start()
+        self.client.subscribe(self.topics['general'], qos=2)
+        self.msg_models = OutgoingMessages()
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -71,17 +75,11 @@ class Communication:
     # This helper method encapsulated the original "on_message" method and handles
     # exceptions thrown by threads spawned by "paho-mqtt"
 
-    def send_ready(self) -> (str, int, int, int):
-        self.send_message('explorer/202', "ready")
+    def send_ready(self):
+        self.send_message(self.topics['general'], self.msg_models.ready())
 
-        planetname = ""
-        startX = 0
-        startY = 0
-        direction = 0
-
-
-        return planetname, startX, startY, direction
-
+    def send_test_planet(self, planet_name):
+        self.send_message(self.topics['general'], self.msg_models.test_planet(planet_name))
 
 
     def safe_on_message_handler(self, client, data, message):
@@ -98,3 +96,7 @@ class Communication:
             import traceback
             traceback.print_exc()
             raise
+
+
+class Message:
+    pass

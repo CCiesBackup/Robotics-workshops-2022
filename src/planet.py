@@ -87,7 +87,5 @@ class Planet:
 
         shortest_path = \
             self.shortest_path_algorithm.find_shortest_path(start, target, self.__paths)
-
-
         return Optional[shortest_path]
 

@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 import uuid
 import signal
 
+from CommunicationFactory import CommunicationFactory
 from communication import Communication
 from odometry import Odometry
 from planet import Direction, Planet
@@ -39,6 +40,13 @@ def run():
 
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
+
+
+    # communication = CommunicationFactory.getInstance(logger)
+    # Be careful: Initializing the communication module establishes a real connection to the server!
+
+
+
     test = Odometry()
     test.linefollowing()
 
