@@ -52,10 +52,11 @@ def run():
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
 
-    #test = Odometry()
-    #test.linefollowing()
-
-    print("Hello world! I didn't crash until now!")
+    # while loop mit Austauschbaren Verhalten
+    test = Odometry()
+    while True:
+        test.linefollowing()
+        
 
 
 

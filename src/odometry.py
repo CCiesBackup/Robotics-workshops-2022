@@ -17,36 +17,30 @@ class Odometry:
     colorArray = []
     strategy = LeftEdge
     farbsensor = Farbsensor
+    left = ev3.LargeMotor("outA")
+    right = ev3.LargeMotor("outD")
+    kp = 300
+    offset = 0.5
+    cs = ev3.ColorSensor()
     
     def __init__(self):
-        """
-        Initializes odometry module
-        """
+        self.left.reset()
+        self.right.reset()
+        
+        self.left.stop_action = "brake"
+        self.right.stop_action = "brake"
+        
+        self.left.command = "run-forever"
+        self.right.command = "run-forever"
+        
+        self.cs.mode = "RGB-RAW"
 
     def direction(self):
         alpha = 0
     
     def linefollowing(self):
-        left = ev3.LargeMotor("outA")
-        right = ev3.LargeMotor("outD")
-        
-        left.reset()
-        right.reset()
-        
-        left.stop_action = "brake"
-        right.stop_action = "brake"
-        
-        left.command = "run-forever"
-        right.command = "run-forever"
-        
-        kp = 300
-        offset = 0.5
-        cs = ev3.ColorSensor()
-        cs.mode = "COL-COLOR"
-        cs.mode = "RGB-RAW"
-        while True:
-            print(cs.bin_data("hhh"))
-            LightValue = self.farbsensor.getBlackWhitePortion(cs.bin_data("hhh")[0], cs.bin_data("hhh")[1], cs.bin_data("hhh")[2])
-            error = LightValue - offset
-            print(f'Error: {error}')
-            self.strategy.driving(error * kp, left, right)
+        print(self.cs.bin_data("hhh"))
+        LightValue = self.farbsensor.getBlackWhitePortion(self.cs.bin_data("hhh")[0], self.cs.bin_data("hhh")[1], self.cs.bin_data("hhh")[2])
+        error = LightValue - self.offset
+        print(f'Error: {error}')
+        self.strategy.driving(error * self.kp, self.left, self.right)
