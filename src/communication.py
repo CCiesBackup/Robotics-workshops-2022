@@ -15,7 +15,7 @@ class Communication:
     """
 
     # DO NOT EDIT THE METHOD SIGNATURE
-    def __init__(self, mqtt_client, logger):
+    def _init_(self, mqtt_client, logger):
         """
         Initializes communication module, connect to server, subscribe, etc.
         :param mqtt_client: paho.mqtt.client.Client
@@ -81,7 +81,17 @@ class Communication:
     def send_test_planet(self, planet_name):
         self.send_message(self.topics['general'], self.msg_models.test_planet(planet_name))
 
+    def send_path(self, start_x, start_y, start_d, end_x, end_y, end_d, path_status):
+        self.send_message(self.topics['planet'],
+                          self.msg_models.path_msg(start_x, start_y, start_d, end_x, end_y, end_d, path_status))
 
+    def send_path_select(self,startX, startY, startD):
+        self.send_message(self.topics['planet'], self.msg_models.path_select(startX, startY, startD))
+    def send_target_reached(self,text):
+        self.send_message(self.topic['general'], self.msg_models.target_reached(text))
+
+    def send_exploration_completed(self,text):
+        self.send_message(self.topics['general'], self.msg_models.exploration_completed(text))
     def safe_on_message_handler(self, client, data, message):
         """
         Handle exceptions thrown by the paho library
