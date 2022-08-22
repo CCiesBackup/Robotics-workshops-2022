@@ -3,6 +3,7 @@
 # Attention: Do not import the ev3dev.ev3 module in this file
 import json
 import ssl
+from typing import Tuple
 
 from MessageModelManager import OutgoingMessages
 
@@ -15,12 +16,13 @@ class Communication:
     """
 
     # DO NOT EDIT THE METHOD SIGNATURE
-    def _init_(self, mqtt_client, logger):
+    def _init_(self, mqtt_client, logger, explorer):
         """
         Initializes communication module, connect to server, subscribe, etc.
         :param mqtt_client: paho.mqtt.client.Client
         :param logger: logging.Logger
         """
+        self.explorer = explorer
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
         self.logger = logger
@@ -33,6 +35,7 @@ class Communication:
         self.client.loop_start()
         self.client.subscribe(self.topics['general'], qos=2)
         self.msg_models = OutgoingMessages()
+        self.planet_name = ""
 
 
     # DO NOT EDIT THE METHOD SIGNATURE
@@ -124,10 +127,14 @@ class Communication:
             raise
 
     def process_target_payload(self, payload):
-        pass
+        target_x = payload["payload"]["targetX"]
+        target_y = payload["payload"]["targetY"]
+        target = Tuple[target_x, target_y]
+        self.explorer.set_target(target)
 
     def process_testPlanet_payload(self, payload):
-        pass
+        if payload["payload"]["planetName"] != self.planet_name:
+            raise ValueError
 
     def process_planet_ready_payload(self, payload):
         local_payload = payload["payload"]

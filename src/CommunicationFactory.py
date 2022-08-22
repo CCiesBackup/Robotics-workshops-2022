@@ -7,9 +7,9 @@ import communication
 
 class CommunicationFactory:
     @classmethod
-    def getInstance(cls, logger):
+    def getInstance(cls, logger, explorer):
         client = mqtt.Client(client_id="202", clean_session=False, protocol=mqtt.MQTTv31)
 
-        return communication.Communication(client, logger)
+        return communication.Communication(client, logger, explorer)
 
     
