@@ -16,7 +16,8 @@ class Communication:
     """
 
     # DO NOT EDIT THE METHOD SIGNATURE
-    def _init_(self, mqtt_client, logger, explorer):
+
+    def __init__(self, mqtt_client, logger, explorer):
         """
         Initializes communication module, connect to server, subscribe, etc.
         :param mqtt_client: paho.mqtt.client.Client
@@ -37,7 +38,6 @@ class Communication:
         self.msg_models = OutgoingMessages()
         self.planet_name = ""
 
-
     # DO NOT EDIT THE METHOD SIGNATURE
     def on_message(self, client, data, message):
         """
@@ -55,7 +55,7 @@ class Communication:
         type = payload[0]["type"]
         if type == "planet":
             self.process_planet_ready_payload(payload[0])
-        if type =="notice":
+        if type == "notice":
             self.process_testPlanet_payload(payload[0])
         if type == "path":
             self.process_path_payload(payload[0])
@@ -73,7 +73,6 @@ class Communication:
             self.process_syntax_payload(payload[0])
         # YOUR CODE FOLLOWS (remove pass, please!)
 
-
     # DO NOT EDIT THE METHOD SIGNATURE
     #
     # In order to keep the logging working you must provide a topic string and
@@ -84,8 +83,6 @@ class Communication:
         encoded_message = json.dumps(message).encode('utf-8')
         self.client.publish(topic, payload=encoded_message, qos=2, retain=False)
 
-
-
     # DO NOT EDIT THE METHOD SIGNATURE OR BODY
     #
     # This helper method encapsulated the original "on_message" method and handles
@@ -94,21 +91,21 @@ class Communication:
     def send_ready(self):
         self.send_message(self.topics['general'], self.msg_models.ready())
 
-
     def send_test_planet(self, planet_name):
+        self.planet_name = planet_name
         self.send_message(self.topics['general'], self.msg_models.test_planet(planet_name))
 
     def send_path(self, start_x, start_y, start_d, end_x, end_y, end_d, path_status):
         self.send_message(self.topics['planet'],
                           self.msg_models.path_msg(start_x, start_y, start_d, end_x, end_y, end_d, path_status))
 
-    def send_path_select(self,startX, startY, startD):
+    def send_path_select(self, startX, startY, startD):
         self.send_message(self.topics['planet'], self.msg_models.path_select(startX, startY, startD))
 
-    def send_target_reached(self,text):
+    def send_target_reached(self, text):
         self.send_message(self.topics['general'], self.msg_models.target_reached(text))
 
-    def send_exploration_completed(self,text):
+    def send_exploration_completed(self, text):
         self.send_message(self.topics['general'], self.msg_models.exploration_completed(text))
 
     def safe_on_message_handler(self, client, data, message):
@@ -137,10 +134,14 @@ class Communication:
             raise ValueError
 
     def process_planet_ready_payload(self, payload):
-        local_payload = payload["payload"]
-        self.topics['planet'] = "planet/" + local_payload["payload"]["planetName"] + "/202"
+        self.planet_name = payload["payload"]["planetName"]
+        self.topics['planet'] = "planet/" + payload["payload"]["planetName"] + "/202"
         self.client.subscribe(self.topics['planet'], qos=2)
 
+        set_off_position = Tuple[payload["payload"]["startX"], payload["payload"]["startY"]]
+        set_off_orientation = payload["payload"]["startOrientation"]
+        self.explorer.current_position = set_off_position
+        self.explorer.current_orientation = set_off_orientation
 
     def process_path_payload(self, payload):
         start_x = payload["payload"]["startX"]
@@ -148,16 +149,17 @@ class Communication:
         start_direction = payload["payload"]["startDirection"]
         end_x = payload["payload"]["endX"]
         end_y = payload["payload"]["endY"]
-        end_direction =["payload"]["endDirection"]
-        start = Tuple[start_x, start_y, start_direction]
-        end = Tuple[end_x, end_y, end_direction]
-
+        end_direction = ["payload"]["endDirection"]
+        start = Tuple[Tuple[start_x, start_y], start_direction]
+        end = Tuple[Tuple[end_x, end_y], end_direction]
+        weight = (-1) if payload["payload"]["pathStatus"] == "blocked" else payload["payload"]["pathWeight"]
+        self.explorer.add_path_intern(start, end, weight)
 
     def process_pathSelect_payload(self, payload):
-        if payload["payload"]["StartDirection"] != self.explorer.get_directions:
+        self.explorer.set_path_select(payload["payload"]["startDirection"])
 
     def process_pathUnveiled_payload(self, payload):
-
+        pass
 
     def process_done_payload(self, payload):
         pass
