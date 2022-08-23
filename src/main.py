@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import time
 
 import ev3dev.ev3 as ev3
 import logging
@@ -42,18 +43,18 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-    # explorer = ExplorationManager()
-    # communication = CommunicationFactory.getInstance(client, logger, explorer)
+    #explorer = ExplorationManager()
+    #communication = CommunicationFactory.getInstance(client, logger, explorer)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
-    # communication.send_test_planet("Reichstag")
+
 
 
     test = Odometry()
     test.linefollowing()
 
     print("Hello world! I didn't crash until now!")
-    # communication.send_ready()
+
 
 
 # DO NOT EDIT

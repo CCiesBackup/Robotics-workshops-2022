@@ -30,8 +30,6 @@ class Communication:
         self.logger = logger
         self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
         self.client.on_message = self.safe_on_message_handler
-        self.client.on_connect = self.on_connect
-        self.client.on_disconnect = self.on_disconnect
         # Add your client setup here
         self.client.username_pw_set('202', password='psguk8hU7n')
         self.client.connect('mothership.inf.tu-dresden.de', port=8883)
@@ -42,15 +40,11 @@ class Communication:
         self.planet_name = ""
         self.exam_mode = True
 
-    # DO NOT EDIT THE METHOD SIGNATURE
-    def on_connect(self, userdata, flags, rc):
-        print("Connected with result code " + str(rc))
 
-    def on_disconnect(self):
-        print("disconnected from the server")
+    # DO NOT EDIT THE METHOD SIGNATURE
 
     def on_message(self, client, data, message):
-        print("Omg, we've actually received a message!!!")
+
         """
         Handles the callback if any message arrived
         :param client: paho.mqtt.client.Client
@@ -59,47 +53,49 @@ class Communication:
         :return: void
         """
         payload = json.loads(message.payload.decode('utf-8'))
-        print(f"Following data has been received: {payload}")
         self.logger.debug(json.dumps(payload, indent=2))
-        message_type = payload[0]["type"]
-        payload_from_value = payload[0]["from"]
+        message_type = payload["type"]
+        payload_from_value = payload["from"]
+        if payload_from_value == "client":
+            return
+        print(f"Following data has been received: {payload}")
         if payload_from_value == "server":
             if message_type == "planet":
-                self.process_planet_ready_payload(payload[0])
+                self.process_planet_ready_payload(payload)
                 return
             if message_type == "notice":
-                self.process_testPlanet_payload(payload[0])
+                self.process_testPlanet_payload(payload)
                 return
             if message_type == "path":
-                self.process_path_payload(payload[0])
+                self.process_path_payload(payload)
                 return
             if message_type == "pathSelect":
-                self.process_pathSelect_payload(payload[0])
+                self.process_pathSelect_payload(payload)
                 return
             if message_type == "pathUnveiled":
-                self.process_pathUnveiled_payload(payload[0])
+                self.process_pathUnveiled_payload(payload)
                 return
             if message_type == "target":
-                self.process_target_payload(payload[0])
+                self.process_target_payload(payload)
                 return
             if message_type == "targetReached":
-                self.process_done_payload(payload[0])
+                self.process_done_payload(payload)
                 return
             if message_type == "done":
-                self.process_done_payload(payload[0])
+                self.process_done_payload(payload)
                 return
             if message_type == "syntax":
-                self.process_syntax_payload(payload[0])
+                self.process_syntax_payload(payload)
                 return
             else:
-                self.process_unknown_payload(payload[0])
+                self.process_unknown_payload(payload)
         elif payload_from_value == "debug":
             if self.exam_mode:
                 print("Received a debug message in the process of the exam. Weird occurrence...")
             else:
-                self.process_syntax_payload(payload[0])
+                self.process_syntax_payload(payload)
         else:
-            self.process_unknown_payload(payload[0])
+            self.process_unknown_payload(payload)
 
     # DO NOT EDIT THE METHOD SIGNATURE
     #
@@ -167,7 +163,7 @@ class Communication:
     def process_target_payload(self, payload):
         target_x = payload["payload"]["targetX"]
         target_y = payload["payload"]["targetY"]
-        target = Tuple[target_x, target_y]
+        target = (target_x, target_y)
         self.explorer.set_target(target)
 
     def process_testPlanet_payload(self, payload):
@@ -228,5 +224,4 @@ class Communication:
         raise MessageProcessingException()
 
     def process_syntax_payload(self, payload):
-        for string in payload["payload"].values():
-            print(string)
+        pass

@@ -25,11 +25,13 @@ class ExplorationManager:
         self.planet = planet.Planet()
 
     def set_target(self, target: Tuple[int, int]):
+        print(f"target set! : {target}")
         self.target_set = True
         self.target = target
-        self.shortest_path = self.planet.shortest_path(self.current_position, target)
-        if self.shortest_path is None:
-            self.target_set = False
+        print("Calculating shortest path to the target... ")
+        #self.shortest_path = self.planet.shortest_path(self.current_position, target)
+        #if self.shortest_path is None:
+        #    self.target_set = False
 
     def push_scanning_results(self, position: Tuple[int, int], *directions):
         self.current_position = position

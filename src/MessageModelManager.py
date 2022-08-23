@@ -21,12 +21,12 @@ class OutgoingMessages:
                     "from": "client",
                     "type": "path",
                     "payload": {
-                                "startX": f"{startX}",
-                                "startY": f"{startY}",
-                                "startDirection": f"{startD}",
-                                "endX": f"{endX}",
-                                "endY": f"{endY}",
-                                "endDirection": f"{endD}",
+                                "startX": startX,
+                                "startY": startY,
+                                "startDirection": startD,
+                                "endX": endX,
+                                "endY": endY,
+                                "endDirection": endD,
                                 #free | blocked
                                 "pathStatus": f"{path_status}"
                     }
@@ -38,9 +38,9 @@ class OutgoingMessages:
                     "from": "client",
                     "type": "pathSelect",
                       "payload": {
-                        "startX": f"{startX}",
-                        "startY": f"{startY}",
-                        "startDirection": f"{startD}"
+                        "startX": startX,
+                        "startY": startY,
+                        "startDirection": startD
                       }
                             }
         return message
