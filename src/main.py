@@ -21,6 +21,7 @@ client = None  # DO NOT EDIT
 
 
 def run():
+    print('Bin online')
     # DO NOT CHANGE THESE VARIABLES
     #
     # The deploy-script uses the variable "client" to stop the mqtt-client after your program stops or crashes.

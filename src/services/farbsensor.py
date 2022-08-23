@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import ev3dev.ev3 as ev3
 class Farbsensor:
     cs = ev3.ColorSensor()
@@ -8,7 +9,7 @@ class Farbsensor:
     def recognizeColour(self):
         if self.isBlue():
             return 0
-        elif self.isBlue():
+        elif self.isRed():
             return 1
         else:
             return self.getBlackWhitePortion()
@@ -42,6 +43,5 @@ class Farbsensor:
         green = self.cs.bin_data("hhh")[1]
         blue = self.cs.bin_data("hhh")[2]
         if red <= 100 and green <= 100 and blue <= 100:
-            print('Is black!')
             return True
         return False

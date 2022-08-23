@@ -4,8 +4,8 @@ import ev3dev.ev3 as ev3
 import time
 
 class Motor(object):
-    tp = 200
-    sleepTimer = 3
+    tp = 220
+    sleepTimer = 2
     # seven = -286
     seven = -310
     left = ev3.LargeMotor("outA")
@@ -58,4 +58,12 @@ class Motor(object):
         self.right.speed_sp = -(powerD)
 
         self.setCommand("run-forever")
-        return
+        return [self.left.position, self.right.position]
+    
+    def stop(self):
+        self.left.stop()
+        self.right.stop()
+    
+    def resetPosition(self):
+        self.left.position = 0
+        self.right.position = 0
