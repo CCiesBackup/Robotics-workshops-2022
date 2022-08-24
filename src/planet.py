@@ -28,8 +28,6 @@ Value:  -1 if blocked path
 
 
 class Planet:
-    # Das mit den nested dictionaries, das war schon so in den Templates
-    # Es ist zweifelsohne nicht die beste Lösung, aber ich halte mich dabei an die Templates!
     __paths = Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]
 
     def __init__(self):
@@ -47,11 +45,13 @@ class Planet:
         target_value_dictionary = getter_target[0]
 
         # Tutor: Make sure that the initialized dictionaries are still referenced to __paths
+        # (that it actually is call by reference, not call by value)
+        # (python is weird)
         start_value_dictionary[start[1]] = ((target[0], target[1]), weight)
         target_value_dictionary[target[1]] = ((start[0], start[1]), weight)
 
-        print(f"Path added! start = {start[0][0]}, {start[0][1]}, weight = {weight}")
-        print(f"Path added! end = {target[0][0]}, {target[0][1]}, weight = {weight}")
+        print(f"Path added! start X= {start[0][0]}, Y= {start[0][1]}, direction = {start[1]}, weight = {weight}")
+        print(f"Path added! end X= {target[0][0]}, Y= {target[0][1]}, direction = {target[1]}, weight = {weight}")
         if getter_start[1]:
             self.__reference_dicts(start[0], start_value_dictionary)
         if getter_target[1]:
@@ -76,7 +76,10 @@ class Planet:
 
         return self.__paths
 
-    def set_SPath_algorithm(self, algorithm: ShortestPathAbstract):
+    def print_paths(self):
+        print(self.__paths)
+
+    def set_shortest_path_algorithm(self, algorithm: ShortestPathAbstract):
         self.shortest_path_algorithm = algorithm
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> \

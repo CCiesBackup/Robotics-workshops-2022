@@ -4,6 +4,8 @@ import unittest.mock
 import paho.mqtt.client as mqtt
 import uuid
 
+from ExplorationManager import ExplorationManager
+from MessageModelManager import OutgoingMessages
 from communication import Communication
 
 """
@@ -18,16 +20,20 @@ class TestRoboLabCommunication(unittest.TestCase):
         """
         Instantiates the communication class
         """
-        client_id = 'YOURGROUPID-' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
+        client_id = '202-' + str(uuid.uuid4())  # Replace YOURGROUPID with your group ID
         client = mqtt.Client(client_id=client_id,  # Unique Client-ID to recognize our program
                              clean_session=False,  # We want to be remembered
                              protocol=mqtt.MQTTv311  # Define MQTT protocol version
                              )
 
         # Initialize your data structure here
-        self.communication = Communication(client, mock_logger)
+        self.explorer = ExplorationManager()
+        self.communication = Communication(client, mock_logger, self.explorer)
 
     def test_message_ready(self):
+        ## fail!
+
+
         """
         This test should check the syntax of the message type "ready"
         """
@@ -46,9 +52,8 @@ class TestRoboLabCommunication(unittest.TestCase):
         self.fail('implement me!')
 
     def test_message_select(self):
-        """
-        This test should check the syntax of the message type "pathSelect"
-        """
+
+
         self.fail('implement me!')
 
     def test_message_complete(self):

@@ -24,6 +24,7 @@ class Communication:
         :param mqtt_client: paho.mqtt.client.Client
         :param logger: logging.Logger
         """
+
         self.explorer = explorer
         # DO NOT CHANGE THE SETUP HERE
         self.client = mqtt_client
@@ -39,7 +40,6 @@ class Communication:
         self.msg_models = OutgoingMessages()
         self.planet_name = ""
         self.exam_mode = True
-
 
     # DO NOT EDIT THE METHOD SIGNATURE
 
@@ -177,8 +177,9 @@ class Communication:
 
         set_off_position = (payload["payload"]["startX"], payload["payload"]["startY"])
         set_off_orientation = payload["payload"]["startOrientation"]
-        self.explorer.current_position = set_off_position
-        self.explorer.current_orientation = set_off_orientation
+        # self.explorer.current_position = set_off_position
+        # self.explorer.current_orientation = set_off_orientation
+        self.explorer.update_current_data(set_off_position, set_off_orientation)
 
     def process_path_payload(self, payload):
         start_x = payload["payload"]["startX"]
@@ -192,19 +193,31 @@ class Communication:
         weight = (-1) if payload["payload"]["pathStatus"] == "blocked" else payload["payload"]["pathWeight"]
         self.explorer.add_path_intern(start, end, weight)
 
+        current_position = (end_x, end_y)
+        current_orientation = (end_direction + 180) % 360
+        self.explorer.update_current_data(current_position, current_orientation)
+
     def process_pathSelect_payload(self, payload):
         self.explorer.set_path_select(payload["payload"]["startDirection"])
 
     def process_pathUnveiled_payload(self, payload):
-        # The functioning of pathUnveiled and path messages is similar, the only difference
-        # is that in pathUnveiled we overwrite some existing data
-        # whereas path is just a confirmation, we insert some data into the database for the first time
-        # data[path] = data # path
-        # data[path] = data2 --> data has been superseded by data2 as in #pathUnveiled;
-        # the inner functioning
-        # is the same, therefore there is no need to implement another function
-        # this one is there for clarity (:
-        self.process_path_payload(payload)
+        self.explorer.paths_changed()
+        # Warning!: if blocked, we have to overwrite the former target node as well!
+        # copy-paste from the path message
+        # we could solve it by the template method pattern, but it would be too much of a hassle
+        # The tutors told me that we favor here simplicity over more professional OOP approach
+        # (and we don't use the path message processing because we don't want to update our position
+        # with pathUnveiled)
+        start_x = payload["payload"]["startX"]
+        start_y = payload["payload"]["startY"]
+        start_direction = payload["payload"]["startDirection"]
+        end_x = payload["payload"]["endX"]
+        end_y = payload["payload"]["endY"]
+        end_direction = payload["payload"]["endDirection"]
+        start = ((start_x, start_y), start_direction)
+        end = ((end_x, end_y), end_direction)
+        weight = (-1) if payload["payload"]["pathStatus"] == "blocked" else payload["payload"]["pathWeight"]
+        self.explorer.add_path_intern(start, end, weight)
 
     def process_done_payload(self, payload):
         if payload["type"] == "done":
@@ -224,4 +237,5 @@ class Communication:
         raise MessageProcessingException()
 
     def process_syntax_payload(self, payload):
+        # legacy, to be deleted if we don't need it
         pass
