@@ -4,7 +4,6 @@ import unittest.mock
 import paho.mqtt.client as mqtt
 import uuid
 
-from ExplorationManager import ExplorationManager
 from MessageModelManager import OutgoingMessages
 from communication import Communication
 
@@ -27,39 +26,83 @@ class TestRoboLabCommunication(unittest.TestCase):
                              )
 
         # Initialize your data structure here
-        self.explorer = ExplorationManager()
-        self.communication = Communication(client, mock_logger, self.explorer)
+        self.communication = Communication(client, mock_logger)
 
     def test_message_ready(self):
-        ## fail!
-
-
-        """
-        This test should check the syntax of the message type "ready"
-        """
+        outgoing = OutgoingMessages()
+        dicti = outgoing.ready()
+        keys = list(dicti.keys())
+        print(keys)
+        print(keys[0])
+        self.assertEqual(keys[0], "from")
+        print(keys[1])
+        self.assertEqual(keys[1], "type")
         self.fail('implement me!')
 
     def test_message_path(self):
-        """
-        This test should check the syntax of the message type "path"
-        """
+        outgoing = OutgoingMessages()
+        dicti = outgoing.path(1, 1, 1, 1, 1, 1)
+        keys = list(dicti.keys())
+        print(keys)
+        print(keys[0])
+        print(keys[1])
+        print(keys[2])
+        print(keys[0] == "from")
+        self.assertEqual(keys[0], "from")
+        self.assertFalse(keys[0] == "server")
+        print(keys[1] == "type")
+        self.assertEqual(keys[1], "type")
+        print(keys[2] == "payload")
+        self.assertEqual(keys[2], "payload")
         self.fail('implement me!')
 
     def test_message_path_invalid(self):
-        """
-        This test should check the syntax of the message type "path" with errors/invalid data
-        """
+        outgoing = OutgoingMessages()
+        dicti = outgoing.path_invalid(1, 1, 1, 1, 1, 1)
+        keys = list(dicti.keys())
+        print(keys)
+        print(keys[0])
+        print(keys[1])
+        print(keys[2])
+        print(keys[0] == "from")
+        self.assertEqual(keys[0], "from")
+        print(keys[1] == "type")
+        self.assertEqual(keys[1], "type")
+        print(keys[2] == "payload")
+        self.assertEqual(keys[2], "payload")
         self.fail('implement me!')
 
     def test_message_select(self):
-
-
+        outgoing = OutgoingMessages()
+        dicti = outgoing.path_select(1, 1, 1)
+        keys = list(dicti.keys())
+        print(keys)
+        print(keys[0])
+        print(keys[1])
+        print(keys[2])
+        print(keys[0] == "from")
+        self.assertEqual(keys[0], "from")
+        self.assertFalse(keys[0] == "server")
+        print(keys[1] == "type")
+        self.assertEqual(keys[1], "type")
+        print(keys[2] == "payload")
+        self.assertEqual(keys[2], "payload")
         self.fail('implement me!')
 
     def test_message_complete(self):
-        """
-        This test should check the syntax of the message type "explorationCompleted" or "targetReached"
-        """
+        outgoing = OutgoingMessages()
+        dicti = outgoing.complete()
+        keys = list(dicti.keys())
+        print(keys)
+        print(keys[0])
+        print(keys[1])
+        print(keys[2])
+        print(keys[0] == "from")
+        self.assertEqual(keys[0], "from")
+        print(keys[1] == "type")
+        self.assertEqual(keys[1], "type")
+        print(keys[2] == "payload")
+        self.assertEqual(keys[2], "payload")
         self.fail('implement me!')
 
 
