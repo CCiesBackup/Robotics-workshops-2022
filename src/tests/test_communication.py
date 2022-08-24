@@ -4,6 +4,7 @@ import unittest.mock
 import paho.mqtt.client as mqtt
 import uuid
 
+from ExplorationManager import ExplorationManager
 from MessageModelManager import OutgoingMessages
 from communication import Communication
 
@@ -26,84 +27,58 @@ class TestRoboLabCommunication(unittest.TestCase):
                              )
 
         # Initialize your data structure here
-        self.communication = Communication(client, mock_logger)
+        explorer = ExplorationManager()
+        self.communication = Communication(client, mock_logger, explorer)
+        self.outgoing = OutgoingMessages()
 
     def test_message_ready(self):
-        outgoing = OutgoingMessages()
-        dicti = outgoing.ready()
+
+        dicti = self.outgoing.ready()
         keys = list(dicti.keys())
-        print(keys)
-        print(keys[0])
         self.assertEqual(keys[0], "from")
-        print(keys[1])
         self.assertEqual(keys[1], "type")
-        self.fail('implement me!')
 
     def test_message_path(self):
-        outgoing = OutgoingMessages()
-        dicti = outgoing.path(1, 1, 1, 1, 1, 1)
+        dicti = self.outgoing.path_msg(1, 1, 1, 1, 1, 1, "free")
         keys = list(dicti.keys())
-        print(keys)
-        print(keys[0])
-        print(keys[1])
-        print(keys[2])
-        print(keys[0] == "from")
+        intern_keys = list(dicti["payload"].keys())
+        self.assertEqual(intern_keys[0], "startX")
         self.assertEqual(keys[0], "from")
         self.assertFalse(keys[0] == "server")
-        print(keys[1] == "type")
         self.assertEqual(keys[1], "type")
-        print(keys[2] == "payload")
         self.assertEqual(keys[2], "payload")
-        self.fail('implement me!')
+
 
     def test_message_path_invalid(self):
-        outgoing = OutgoingMessages()
-        dicti = outgoing.path_invalid(1, 1, 1, 1, 1, 1)
+        dicti = self.outgoing.path_msg(1, 1, 1, 1, 1, 1, "blocked")
         keys = list(dicti.keys())
-        print(keys)
-        print(keys[0])
-        print(keys[1])
-        print(keys[2])
-        print(keys[0] == "from")
         self.assertEqual(keys[0], "from")
-        print(keys[1] == "type")
         self.assertEqual(keys[1], "type")
-        print(keys[2] == "payload")
         self.assertEqual(keys[2], "payload")
-        self.fail('implement me!')
+
 
     def test_message_select(self):
-        outgoing = OutgoingMessages()
-        dicti = outgoing.path_select(1, 1, 1)
+        dicti = self.outgoing.path_select(1, 1, 1)
         keys = list(dicti.keys())
-        print(keys)
-        print(keys[0])
-        print(keys[1])
-        print(keys[2])
-        print(keys[0] == "from")
         self.assertEqual(keys[0], "from")
         self.assertFalse(keys[0] == "server")
-        print(keys[1] == "type")
         self.assertEqual(keys[1], "type")
-        print(keys[2] == "payload")
         self.assertEqual(keys[2], "payload")
-        self.fail('implement me!')
+
 
     def test_message_complete(self):
-        outgoing = OutgoingMessages()
-        dicti = outgoing.complete()
+        dicti = self.outgoing.exploration_completed("Dupa")
         keys = list(dicti.keys())
-        print(keys)
-        print(keys[0])
-        print(keys[1])
-        print(keys[2])
-        print(keys[0] == "from")
         self.assertEqual(keys[0], "from")
-        print(keys[1] == "type")
         self.assertEqual(keys[1], "type")
-        print(keys[2] == "payload")
         self.assertEqual(keys[2], "payload")
-        self.fail('implement me!')
+
+    def test_target_reached(self):
+        dicti = self.outgoing.target_reached("Dupa")
+        keys = list(dicti.keys())
+        self.assertEqual(keys[0], "from")
+        self.assertEqual(keys[1], "type")
+        self.assertEqual(keys[2], "payload")
 
 
 if __name__ == "__main__":
