@@ -10,7 +10,6 @@ class Farbsensor:
         red = self.cs.bin_data("hhh")[0]
         green = self.cs.bin_data("hhh")[1]
         blue = self.cs.bin_data("hhh")[2]
-        print(f'Color: {self.cs.bin_data("hhh")}')
         if self.isBlue(red, green, blue):
             return 0
         elif self.isRed(red, green, blue):

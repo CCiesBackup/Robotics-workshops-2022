@@ -50,6 +50,7 @@ class Odometry:
         alpha = 0
     
     def driving(self):
+        # Farben einscannen zum kalibrieren
         loop = True
         # print(f'Start: Left: {self.leftMotor}, Right: {self.rightMotor} , Direction: {self.lookDirection  * 360 / math.pi}')
         while loop:
@@ -105,7 +106,7 @@ class Odometry:
         self.getCurrentDist(temp[0], temp[1])
         
     def getCurrentDist(self, left, right):
-        print(f'RelPos: {left}, {right}')
+        # print(f'RelPos: {left}, {right}')
         tempLeft = -self.calcDist(left + self.leftMotor['position'])
         tempRight = -self.calcDist(right + self.rightMotor['position'])
         self.leftMotor['position'] = -left
@@ -113,9 +114,9 @@ class Odometry:
         self.calcDirection(tempLeft, tempRight)
     
     def calcDirection(self, left, right):
-        print(f'RelDist: {left}, {right}')
+        # print(f'RelDist: {left}, {right}')
         self.lookDirection += (right - left) / self.wheeldist
-        print(f'Direct: {(right - left) / self.wheeldist}')
+        # print(f'Direct: {(right - left) / self.wheeldist}')
         
     def clacTotalDist(self):
         dr = self.calcDist(self.rightMotor['position'])

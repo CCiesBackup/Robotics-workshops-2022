@@ -4,19 +4,26 @@ import ev3dev.ev3 as ev3
 import time
 
 class Motor(object):
-    sleepTimer = 2
+    sleepTimer = 1.75
     seven = -310
     left = ev3.LargeMotor("outA")
     right = ev3.LargeMotor("outD")
     
-    tp = 300
-    kp = 600
-    offset = 0.5
+    tp = 250
+    kp = 500
+    offset = 0
     error = 0
     turn = 0
-    ki = 1
+    ki = 400
+    dt = 0
+    integral = 0
+
+    white = 0.86
+    black = 0.12
+    
     
     def __init__(self):
+        self.offset = (self.white + self.black) / 2
         
         self.left.reset()
         self.right.reset()
@@ -46,13 +53,13 @@ class Motor(object):
         self.setCommand("run-to-rel-pos")
     
     def driveLine(self, lightValue):
-        print(f'Light: {lightValue}')
         self.error = lightValue - self.offset
-        print(f'Error: {self.error}')
-        # self.integral -= error
+        self.integral += self.error
         # self.derivative = error - self.lastError
         # turn = error * self.kp + self.ki * self.integral + self.kd * self.derivative
         self.turn = self.error * self.kp
+        if self.error >= 0.3 or self.error <= -0.3:
+            self.turn += (self.turn / 2)
         # self.lastError = error
         powerA = self.tp - self.turn
         powerD = self.tp + self.turn
@@ -86,8 +93,9 @@ class Motor(object):
         self.left.position_sp = position
         self.right.position_sp = position
     
-    def test(self):
-        self.setspeed(200, 200)
-        self.setPositionSP(260)
-        self.setCommand("run-to-rel-pos")
+    def calcWhiteTare(self):
+        self.whiteTare = 0.5 / (self.white - self.offset)
+    
+    def calcBlackTare(self):
+        self.blackTare = -0.5 / (self.black - self.offset)
         
