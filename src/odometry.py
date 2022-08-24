@@ -28,13 +28,13 @@ class Odometry:
     paths = dict(east = False, south = True, west = False, north = False)
     directives = ['east', 'south', 'west', 'north']
     # enum 0,90,180,270
-    lookDirection = 0
+    radians = 0
     leftMotor = dict(position=0)
     rightMotor = dict(position=0)
     totalDist = 0
     
     wheeldist = 14.5
-    threeSixtee = 300
+    threeSixtee = 360
     distPerDegree = math.pi * 3 / threeSixtee
     
     # ki = 1
@@ -52,7 +52,7 @@ class Odometry:
     def driving(self):
         # Farben einscannen zum kalibrieren
         loop = True
-        # print(f'Start: Left: {self.leftMotor}, Right: {self.rightMotor} , Direction: {self.lookDirection  * 360 / math.pi}')
+        # print(f'Start: Left: {self.leftMotor}, Right: {self.rightMotor} , Direction: {self.radians  * 360 / math.pi}')
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
                 print('something in my way')
@@ -80,25 +80,23 @@ class Odometry:
                 if self.farbsensor.isBlack():
                     self.paths[self.directives[index]] = True
         print(self.paths)
-        # self.lookDirection, self.pahts, self.colorArray[self.colorArray.__len__]
+        # self.radians, self.pahts, self.colorArray[self.colorArray.__len__]
         return
     
     def turnAround(self):
         self.motor.turnRight()
-        time.sleep(2.5)
+        time.sleep(2.25)
         self.motor.turnRight()
-        time.sleep(2.5)
+        time.sleep(2.25)
         
     def driveAtPoint(self):
         self.motor.tare()
         self.motor.driveSevenCM()
         self.findPath()
-        self.totalDist = self.clacTotalDist() - 4
-        posLeft = self.leftMotor.get('position') / self.threeSixtee
-        posRight = self.rightMotor.get('position') / self.threeSixtee
-        print(f'Total: {self.totalDist}')
-        print(f'Rotation: {posLeft}, {posRight}')
-        print(f'Direction: {self.lookDirection * 360 / math.pi}')
+        self.totalDist = self.clacTotalDist()
+        grad = self.radians * 180 / math.pi
+        print(f'Der Roboter ist {self.roundToFifty(self.totalDist)}cm gefahren und damit {(self.roundToFifty(self.totalDist) / 50)} Kästchen')
+        print(f'Der Roboter hat eine {self.roundToNinety(grad)}° Drehung gemacht')
         ev3.Sound.play('bark.wav')
     
     def driveLine(self, lightValue):
@@ -106,7 +104,6 @@ class Odometry:
         self.getCurrentDist(temp[0], temp[1])
         
     def getCurrentDist(self, left, right):
-        # print(f'RelPos: {left}, {right}')
         tempLeft = -self.calcDist(left + self.leftMotor['position'])
         tempRight = -self.calcDist(right + self.rightMotor['position'])
         self.leftMotor['position'] = -left
@@ -114,9 +111,7 @@ class Odometry:
         self.calcDirection(tempLeft, tempRight)
     
     def calcDirection(self, left, right):
-        # print(f'RelDist: {left}, {right}')
-        self.lookDirection += (right - left) / self.wheeldist
-        # print(f'Direct: {(right - left) / self.wheeldist}')
+        self.radians += (right - left) / self.wheeldist
         
     def clacTotalDist(self):
         dr = self.calcDist(self.rightMotor['position'])
@@ -125,3 +120,9 @@ class Odometry:
         
     def calcDist(self, degree):
         return degree * self.distPerDegree
+    
+    def roundToNinety(self, number):
+        return round(number / 90) * 90
+    
+    def roundToFifty(self, number):
+        return round(number / 50) * 50

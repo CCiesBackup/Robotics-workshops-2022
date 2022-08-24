@@ -4,7 +4,7 @@ import ev3dev.ev3 as ev3
 import time
 
 class Motor(object):
-    sleepTimer = 1.75
+    sleepTimer = 1.25
     seven = -310
     left = ev3.LargeMotor("outA")
     right = ev3.LargeMotor("outD")
