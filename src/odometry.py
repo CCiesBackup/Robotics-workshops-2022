@@ -30,14 +30,20 @@ class Odometry:
     paths = dict(east = False, south = True, west = False, north = False)
     directives = ['east', 'south', 'west', 'north']
     # enum 0,90,180,270
-    radians = 0
-    leftMotor = dict(position=0)
-    rightMotor = dict(position=0)
-    totalDist = 0
+    leftMotor = 0
+    rightMotor = 0
     currentDirection = 0
+    data = []
     coordinates = (0,0)
     
-    wheeldist = 14.5
+    totalDist = 0
+    destination = (0,0)
+    radians = 0
+    
+    ds = 0
+    relRadiant = 0
+    
+    wheeldist = 15.1
     threeSixtee = 360
     distPerDegree = math.pi * 3 / threeSixtee
     
@@ -72,9 +78,8 @@ class Odometry:
     
     def driving(self):
         print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
-        self.stealTime()
+        # self.stealTime()
         loop = True
-        # print(f'Start: Left: {self.leftMotor}, Right: {self.rightMotor} , Direction: {self.radians  * 360 / math.pi}')
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
                 print('something in my way')
@@ -102,7 +107,6 @@ class Odometry:
                 if self.farbsensor.isBlack():
                     self.paths[self.directives[index]] = True
         print(self.paths)
-        # self.radians, self.pahts, self.colorArray[self.colorArray.__len__]
         return
     
     def turnAround(self):
@@ -114,33 +118,69 @@ class Odometry:
         self.motor.driveSevenCM()
         self.findPath()
         ev3.Sound.beep()
-        self.totalDist = self.clacTotalDist()
-        grad = self.radians * 180 / math.pi
-        print(f'Der Roboter ist {self.roundToFifty(self.totalDist)}cm gefahren und damit {(self.roundToFifty(self.totalDist) / 50)} Kästchen')
-        print(f'Der Roboter hat eine {self.roundToNinety(grad)}° Drehung gemacht')
-        ev3.Sound.play('bark.wav')
+        
+        # calc Data
+        list(map(self.setCalculatedData, self.data))
+        self.calcXY()
+        grad = self.radians / (2 * math.pi) * 360
+        self.destination = (self.destination[0] / 50, self.destination[1] / 50)
+        print(f'S: {self.totalDist}, Grad: {grad}, Koordinaten: {self.destination}')
     
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
-        self.getCurrentDist(temp[0], temp[1])
-        
-    def getCurrentDist(self, left, right):
-        tempLeft = -self.calcDist(left + self.leftMotor['position'])
-        tempRight = -self.calcDist(right + self.rightMotor['position'])
-        self.leftMotor['position'] = -left
-        self.rightMotor['position'] = -right
-        self.calcDirection(tempLeft, tempRight)
+        distTupel = self.getLocalDegree(temp[0], temp[1])
+        self.data.append(distTupel)
+    
+    def getLocalDegree(self, left, right):
+        tempLeft = -(left + self.leftMotor)
+        tempRight = -(right + self.rightMotor)
+        self.leftMotor = -left
+        self.rightMotor = -right
+        return (tempLeft, tempRight)
+    
+    def setCalculatedData(self, tupel):
+        left = tupel[0]
+        right = tupel[1]
+
+        # calc radiant
+        radiant = self.calcDirection(left, right)
+        self.radians += radiant
+        self.relRadiant += radiant
+
+        # calc s
+        s = self.clacTotalDist(left, right, radiant)
+        self.totalDist += s
+        self.ds += s
+
+        # calc x,y
+        if (self.ds >= 50):
+            self.calcXY()
+        return
     
     def calcDirection(self, left, right):
-        self.radians += (right - left) / self.wheeldist
+        dr = self.calcDist(right)
+        dl = self.calcDist(left)
+        return (dr - dl) / self.wheeldist
         
-    def clacTotalDist(self):
-        dr = self.calcDist(self.rightMotor['position'])
-        dl = self.calcDist(self.leftMotor['position'])
-        return self.wheeldist * ((dr + dl) / (dr - dl) * math.sin((dr - dl) / (2 * self.wheeldist)))
+    def clacTotalDist(self, dr, dl, radiant):
+        ds = (self.calcDist(dr) + self.calcDist(dl)) / 2
+        if radiant == 0:
+            return ds
+        return 2 * (ds /radiant) * (radiant / 2)
         
     def calcDist(self, degree):
         return degree * self.distPerDegree
+    
+    def calcXY(self):
+        x = self.destination[0]
+        y = self.destination[1]
+        print(f'Radiant: {self.relRadiant}, S: {self.ds}')
+        x += self.ds * math.cos(self.relRadiant)
+        y += self.ds * math.sin(self.relRadiant)
+        print(f'Koordinaten: {(x,y)}')
+        self.destination = (x,y)
+        self.ds = 0
+        self.relRadiant = 0
     
     def roundToNinety(self, number):
         return round(number / 90) * 90
