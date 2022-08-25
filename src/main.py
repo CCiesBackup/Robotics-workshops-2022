@@ -53,7 +53,7 @@ def run():
 
 
     # while loop mit Austauschbaren Verhalten
-    test = Odometry()
+    test = Odometry(0,(0,0))
     test.driving()
         
 

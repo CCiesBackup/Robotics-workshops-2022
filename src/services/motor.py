@@ -18,14 +18,9 @@ class Motor(object):
     dt = 0
     integral = 0
     ninety = 442
-
-    white = 0.86
-    black = 0.12
     
     
     def __init__(self):
-        self.offset = (self.white + self.black) / 2
-        
         self.left.reset()
         self.right.reset()
         
@@ -105,3 +100,6 @@ class Motor(object):
         self.setspeed(500, -(500))
         
         self.setCommand("run-to-rel-pos")
+    
+    def setOffset(self, black, white):
+        self.offset = (white + black) / 2

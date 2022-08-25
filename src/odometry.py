@@ -9,6 +9,7 @@
 # Navigation, Koordinaten, Richtung der Strecken
 # Navigation durch externe Klassen
 from pickle import FALSE
+from typing import Tuple
 import ev3dev.ev3 as ev3
 from services.farbsensor import Farbsensor
 from services.schallsensor import Schallsensor
@@ -24,6 +25,7 @@ class Odometry:
     left = ev3.LargeMotor("outA")
     right = ev3.LargeMotor("outD")
     motor = Motor()
+    btn = ev3.Button()
 
     paths = dict(east = False, south = True, west = False, north = False)
     directives = ['east', 'south', 'west', 'north']
@@ -32,6 +34,8 @@ class Odometry:
     leftMotor = dict(position=0)
     rightMotor = dict(position=0)
     totalDist = 0
+    currentDirection = 0
+    coordinates = (0,0)
     
     wheeldist = 14.5
     threeSixtee = 360
@@ -43,14 +47,28 @@ class Odometry:
     # lastError = 0
     # derivative = 0
     
-    def __init__(self):
-        'return'
+    def __init__(self, currentDirection, coordinates):
+        self.currentDirection = currentDirection
+        self.coordinates = coordinates
+        
+        blue = self.calibration('Blau')
+        time.sleep(1)
+        red = self.calibration('Rot')
+        time.sleep(1)
+        white = self.calibration('Weiß')
+        time.sleep(1)
+        black = self.calibration('Schwarz')
+        self.farbsensor.setColors(black, blue, red)
+        self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
+        time.sleep(1)
+        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}')
 
     def direction(self):
         alpha = 0
     
     def driving(self):
-        # Farben einscannen zum kalibrieren
+        print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
+        self.stealTime()
         loop = True
         # print(f'Start: Left: {self.leftMotor}, Right: {self.rightMotor} , Direction: {self.radians  * 360 / math.pi}')
         while loop:
@@ -126,3 +144,14 @@ class Odometry:
     
     def roundToFifty(self, number):
         return round(number / 50) * 50
+    
+    def calibration(self, color):
+        print(f'Kalibrierung der Farbe {color}.')
+        print('Bitte plazieren Sie den Sensor über der entsprechenden Farbe und drücken Sie irgendeine Taste am Roboter um zu kalibrieren.')
+        while not self.btn.any():
+            time.sleep(0.01)
+        return self.farbsensor.getRawColor()
+    
+    def stealTime(self):
+        while not self.btn.any():
+            time.sleep(0.01)
