@@ -1,6 +1,8 @@
 # Paths structure:
 # Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]
 def planet_cherry():
+    # for reference:
+    # https://robolab.inf.tu-dresden.de/planets/Cherry.png
     graph = {
         (6, -2): {90: ((8, -1), 0, 2), 0: ((8, -1), 270, 2), 270: ((5, -2), 90, 1)},
         (8, -1): {270: ((6, -2), 0, 2), 0: ((6, -2), 90, 2)},
