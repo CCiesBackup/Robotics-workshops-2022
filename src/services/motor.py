@@ -17,6 +17,7 @@ class Motor(object):
     ki = 400
     dt = 0
     integral = 0
+    ninety = 442
 
     white = 0.86
     black = 0.12
@@ -45,12 +46,7 @@ class Motor(object):
     
     def turnRight(self):
         print('Drehe nach rechts')
-        self.left.position_sp = -442
-        self.right.position_sp = 442
-        
-        self.setspeed(500, -(500))
-        
-        self.setCommand("run-to-rel-pos")
+        self.curve(self.ninety)
     
     def driveLine(self, lightValue):
         self.error = lightValue - self.offset
@@ -98,4 +94,14 @@ class Motor(object):
     
     def calcBlackTare(self):
         self.blackTare = -0.5 / (self.black - self.offset)
+    
+    def driveToDirection(self, currentDirection, destination):
+        temp = ((destination - currentDirection) / 90) * self.ninety
+        self.curve(temp)
+    
+    def curve(self, position):
+        self.left.position_sp = -position
+        self.right.position_sp = position
+        self.setspeed(500, -(500))
         
+        self.setCommand("run-to-rel-pos")
