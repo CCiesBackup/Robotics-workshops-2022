@@ -51,17 +51,17 @@ class Odometry:
         self.currentDirection = currentDirection
         self.coordinates = coordinates
         
-        blue = self.calibration('Blau')
-        time.sleep(1)
-        red = self.calibration('Rot')
-        time.sleep(1)
-        white = self.calibration('Weiß')
-        time.sleep(1)
-        black = self.calibration('Schwarz')
-        # red = (112, 31, 20)
-        # blue = (27, 97, 81)
-        # white = (163, 240, 147)
-        # black = (23, 34, 19)
+        # blue = self.calibration('Blau')
+        # time.sleep(1)
+        # red = self.calibration('Rot')
+        # time.sleep(1)
+        # white = self.calibration('Weiß')
+        # time.sleep(1)
+        # black = self.calibration('Schwarz')
+        red = (112, 31, 20)
+        blue = (27, 97, 81)
+        white = (163, 240, 147)
+        black = (23, 34, 19)
         self.farbsensor.setColors(black, blue, red)
         self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
         time.sleep(1)
@@ -78,7 +78,7 @@ class Odometry:
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
                 print('something in my way')
-                # ev3.Sound.play('quak.wav')
+                ev3.Sound.play('/home/robot/src/assets/quack.wav')
                 self.turnAround()
             
             color = self.farbsensor.recognizeColour()
@@ -106,15 +106,14 @@ class Odometry:
         return
     
     def turnAround(self):
-        self.motor.turnRight()
-        time.sleep(2.25)
-        self.motor.turnRight()
+        self.motor.curve(self.motor.ninety * 2)
         time.sleep(2.25)
         
     def driveAtPoint(self):
         self.motor.tare()
         self.motor.driveSevenCM()
         self.findPath()
+        ev3.Sound.beep()
         self.totalDist = self.clacTotalDist()
         grad = self.radians * 180 / math.pi
         print(f'Der Roboter ist {self.roundToFifty(self.totalDist)}cm gefahren und damit {(self.roundToFifty(self.totalDist) / 50)} Kästchen')
