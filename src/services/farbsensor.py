@@ -24,7 +24,7 @@ class Farbsensor:
         return (red + green + blue) / 765
 
     def isBlue(self, red, green, blue):
-        if red <= (self.blue[0] + 20) and green <= (self.blue[1] + 20) and blue <= (self.blue[2] + 20) and blue >= (self.blue[0] - 20):
+        if red <= (self.blue[0] + 10) and green >= (self.blue[1] - 10) and green <= (self.blue[1] + 10) and blue <= (self.blue[2] + 10) and blue >= (self.blue[0] - 10):
             print('Is blue!')
             return True
         return False
