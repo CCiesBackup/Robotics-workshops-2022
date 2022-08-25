@@ -54,12 +54,15 @@ class TestRoboLabPlanet(unittest.TestCase):
         """
         This test should check that the dictionary returned by "planet.get_paths()" matches the expected structure
         """
+        dicti = self.outgoing.get_paths()
+
         self.fail('implement me!')
 
     def test_empty_planet(self):
         """
         This test should check that an empty planet really is empty
         """
+
         self.fail('implement me!')
 
     def test_target(self):
@@ -68,6 +71,9 @@ class TestRoboLabPlanet(unittest.TestCase):
 
         Requirement: Minimum distance is three nodes (two paths in list returned)
         """
+
+        self.assertEqual(endX,endY,endD)
+
         self.fail('implement me!')
 
     def test_target_not_reachable(self):
