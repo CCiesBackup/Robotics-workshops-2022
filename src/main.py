@@ -21,6 +21,7 @@ client = None  # DO NOT EDIT
 
 
 def run():
+    print('Bin online')
     # DO NOT CHANGE THESE VARIABLES
     #
     # The deploy-script uses the variable "client" to stop the mqtt-client after your program stops or crashes.
@@ -46,17 +47,17 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-    # internet_explorer = com.CommunicationExplorationInterface(client, logger)
 
-
+    # communication = CommunicationFactory.getInstance(logger)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
 
-    #test = Odometry()
-    #test.linefollowing()
+    # while loop mit Austauschbaren Verhalten
+    test = Odometry(0,(0,0))
+    test.driving()
+        
 
-    print("Hello world! I didn't crash until now!")
-
+    print("RIP")
 
 
 # DO NOT EDIT
