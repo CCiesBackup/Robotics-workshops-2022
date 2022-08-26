@@ -38,6 +38,7 @@ class Odometry:
 
     destination = (0,0)
     radians = 0
+    somethingInWay = False
     
     wheeldist = 15.1
     threeSixtee = 360
@@ -54,14 +55,16 @@ class Odometry:
         # white = self.calibration('Weiß')
         # time.sleep(1)
         # black = self.calibration('Schwarz')
+        # time.sleep(1)
+        yellow = self.calibration('Gelb')
         red = (112, 31, 20)
         blue = (27, 97, 81)
         white = (163, 240, 147)
         black = (23, 34, 19)
-        self.farbsensor.setColors(black, blue, red)
+        self.farbsensor.setColors(black, blue, red, yellow)
         self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
         time.sleep(1)
-        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}, Offset: {0.5}')
+        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}, Yellow: {yellow}')
 
     def direction(self):
         alpha = self.radians / (2 * math.pi) * 360
@@ -75,8 +78,8 @@ class Odometry:
         loop = True
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
-                print('something in my way')
                 ev3.Sound.play('/home/robot/src/assets/quack.wav')
+                self.somethingInWay = True
                 self.turnAround()
             
             color = self.farbsensor.recognizeColour()
@@ -89,6 +92,10 @@ class Odometry:
                 self.colorArray.append('red')
                 self.driveAtPoint()
                 loop = False
+            elif color == 2:
+                ev3.Sound.play('/home/robot/src/assets/quack.wav')
+                self.somethingInWay = True
+                self.turnAround()
             else:
                 self.driveLine(color)
                 
@@ -191,6 +198,7 @@ class Odometry:
     def pushData(self):
         grad = self.radians / (2 * math.pi) * 360
         print(f' Grad: {self.roundToNinety(grad)}, Koordinaten: {self.getTarget()}')
+        self.somethingInWay = False
     
     def getTarget(self):
         tempCoord = (0,0)
