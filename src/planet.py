@@ -31,7 +31,7 @@ class Planet:
     __paths = Dict[Tuple[int, int], Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]]
 
     def __init__(self):
-        self.shortest_path_algorithm = ShortestPathAbstract.DijkstraAlgorithm()
+        self.shortest_path_algorithm = None
         self.__paths = {}
 
     def add_path(self,
@@ -50,8 +50,6 @@ class Planet:
         start_value_dictionary[start[1]] = ((target[0], target[1]), weight)
         target_value_dictionary[target[1]] = ((start[0], start[1]), weight)
 
-        print(f"Path added! start X= {start[0][0]}, Y= {start[0][1]}, direction = {start[1]}, weight = {weight}")
-        print(f"Path added! end X= {target[0][0]}, Y= {target[0][1]}, direction = {target[1]}, weight = {weight}")
         if getter_start[1]:
             self.__reference_dicts(start[0], start_value_dictionary)
         if getter_target[1]:
@@ -84,7 +82,8 @@ class Planet:
 
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> \
             Optional[List[Tuple[Tuple[int, int], Direction]]]:
-
+        if self.shortest_path_algorithm is None:
+            self.shortest_path_algorithm = ShortestPathAbstract.DijkstraAlgorithm(self.__paths)
         shortest_path = \
             self.shortest_path_algorithm.find_shortest_path(start, target, self.__paths)
         return Optional[shortest_path]

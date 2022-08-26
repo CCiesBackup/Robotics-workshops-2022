@@ -41,9 +41,9 @@ class ExplorationManager:
         self.target_set = True
         self.target = target
         print("Calculating shortest path to the target... ")
-        # self.shortest_path = self.planet.shortest_path(self.current_position, target)
-        # if self.shortest_path is None:
-        #    self.target_set = False
+        self.shortest_path = self.planet.shortest_path(self.current_position, target)
+        if self.shortest_path is None:
+            self.target_set = False
         self.path_changed = False
 
     def push_scanning_results(self, *directions):
@@ -159,6 +159,10 @@ class ExplorationManager:
         return (direction + 180) % 360
 
     def get_closest_neighbour_with_unknown_paths(self, position):
+
+        #
+        # TO BE WORKED ON TOMORROW
+        #
         neighbours = self.get_neighbours(position)
         eligible_neighbours = []
         for neighbour in neighbours:

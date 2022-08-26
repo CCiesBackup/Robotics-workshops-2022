@@ -11,4 +11,4 @@ def test_dijkstra(start, target, paths):
 
 
 if __name__ == '__main__':
-    print(test_dijkstra((8, -1), (9, 2), GraphGenerator.planet_cherry()))
+    print(test_dijkstra((6, 1), (7, 1), GraphGenerator.planet_cherry()))
