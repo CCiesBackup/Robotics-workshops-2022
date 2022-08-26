@@ -40,9 +40,6 @@ class Odometry:
     destination = (0,0)
     radians = 0
     
-    ds = 0
-    relRadiant = 0
-    
     wheeldist = 15.1
     threeSixtee = 360
     distPerDegree = math.pi * 3 / threeSixtee
@@ -71,14 +68,14 @@ class Odometry:
         self.farbsensor.setColors(black, blue, red)
         self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
         time.sleep(1)
-        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}')
+        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}, Offset: {0.5}')
 
     def direction(self):
         alpha = 0
     
     def driving(self):
         print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
-        # self.stealTime()
+        self.stealTime()
         loop = True
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
@@ -121,7 +118,6 @@ class Odometry:
         
         # calc Data
         list(map(self.setCalculatedData, self.data))
-        self.calcXY()
         grad = self.radians / (2 * math.pi) * 360
         self.destination = (self.destination[0] / 50, self.destination[1] / 50)
         print(f'S: {self.totalDist}, Grad: {grad}, Koordinaten: {self.destination}')
@@ -145,16 +141,13 @@ class Odometry:
         # calc radiant
         radiant = self.calcDirection(left, right)
         self.radians += radiant
-        self.relRadiant += radiant
 
         # calc s
         s = self.clacTotalDist(left, right, radiant)
         self.totalDist += s
-        self.ds += s
 
         # calc x,y
-        if (self.ds >= 50):
-            self.calcXY()
+        self.calcXY(s)
         return
     
     def calcDirection(self, left, right):
@@ -171,16 +164,12 @@ class Odometry:
     def calcDist(self, degree):
         return degree * self.distPerDegree
     
-    def calcXY(self):
+    def calcXY(self, s):
         x = self.destination[0]
         y = self.destination[1]
-        print(f'Radiant: {self.relRadiant}, S: {self.ds}')
-        x += self.ds * math.cos(self.relRadiant)
-        y += self.ds * math.sin(self.relRadiant)
-        print(f'Koordinaten: {(x,y)}')
+        x += s * math.cos(self.radians)
+        y += s * math.sin(self.radians)
         self.destination = (x,y)
-        self.ds = 0
-        self.relRadiant = 0
     
     def roundToNinety(self, number):
         return round(number / 90) * 90

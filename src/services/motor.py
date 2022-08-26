@@ -10,14 +10,18 @@ class Motor(object):
     right = ev3.LargeMotor("outD")
     
     tp = 250
-    kp = 500
-    offset = 0
+    kp = 400
+    offset = 0.5
     error = 0
+    lastError = 0
     turn = 0
-    ki = 400
-    dt = 0
+    ki = 10
+    kd = 400
     integral = 0
+    derivative = 0
     ninety = 442
+    valueRangeBlack = 0
+    valueRangeWhite = 0
     
     
     def __init__(self):
@@ -46,12 +50,9 @@ class Motor(object):
     def driveLine(self, lightValue):
         self.error = lightValue - self.offset
         self.integral += self.error
-        # self.derivative = error - self.lastError
-        # turn = error * self.kp + self.ki * self.integral + self.kd * self.derivative
-        self.turn = self.error * self.kp
-        if self.error >= 0.3 or self.error <= -0.3:
-            self.turn += (self.turn / 2)
-        # self.lastError = error
+        self.derivative = self.error - self.lastError
+        self.turn = self.error * self.kp + self.ki * self.integral + self.kd * self.derivative
+        self.lastError = self.error
         powerA = self.tp - self.turn
         powerD = self.tp + self.turn
         
@@ -84,12 +85,6 @@ class Motor(object):
         self.left.position_sp = position
         self.right.position_sp = position
     
-    def calcWhiteTare(self):
-        self.whiteTare = 0.5 / (self.white - self.offset)
-    
-    def calcBlackTare(self):
-        self.blackTare = -0.5 / (self.black - self.offset)
-    
     def driveToDirection(self, currentDirection, destination):
         temp = ((destination - currentDirection) / 90) * self.ninety
         self.curve(temp)
@@ -102,4 +97,6 @@ class Motor(object):
         self.setCommand("run-to-rel-pos")
     
     def setOffset(self, black, white):
-        self.offset = (white + black) / 2
+        self.valueRangeBlack = black - self.offset
+        self.valueRangeWhite = white - self.offset
+        print(f'Offset: {self.offset}, Range: {self.valueRangeBlack}, {self.valueRangeWhite}')
