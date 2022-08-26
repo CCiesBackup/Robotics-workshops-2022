@@ -204,7 +204,7 @@ class Odometry:
     def getTarget(self):
         tempCoord = (0,0)
         if self.currentDirection == 0:
-            tempCoord = (self.coordinates[0] - self.destination[1], self.coordinates[1] - self.destination[0])
+            tempCoord = (self.coordinates[0] - self.destination[1], self.coordinates[1] + self.destination[0])
         elif self.currentDirection == 90:
             tempCoord = (self.coordinates[0] + self.destination[0], self.coordinates[1] + self.destination[1])
         elif self.currentDirection == 180:
