@@ -35,20 +35,13 @@ class Odometry:
     currentDirection = 0
     data = []
     coordinates = (0,0)
-    
-    totalDist = 0
+
     destination = (0,0)
     radians = 0
     
     wheeldist = 15.1
     threeSixtee = 360
     distPerDegree = math.pi * 3 / threeSixtee
-    
-    # ki = 1
-    # kd = 100
-    # integral = 0
-    # lastError = 0
-    # derivative = 0
     
     def __init__(self, currentDirection, coordinates):
         self.currentDirection = currentDirection
@@ -71,9 +64,12 @@ class Odometry:
         print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}, Offset: {0.5}')
 
     def direction(self):
-        alpha = 0
+        alpha = self.radians / (2 * math.pi) * 360
+        return self.roundToNinety(alpha)
     
     def driving(self):
+        self.radians = 0
+        self.destination = (0,0)
         print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
         self.stealTime()
         loop = True
@@ -118,9 +114,8 @@ class Odometry:
         
         # calc Data
         list(map(self.setCalculatedData, self.data))
-        grad = self.radians / (2 * math.pi) * 360
         self.destination = (self.destination[0] / 50, self.destination[1] / 50)
-        print(f'S: {self.totalDist}, Grad: {grad}, Koordinaten: {self.destination}')
+        self.pushData()
     
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
@@ -144,7 +139,6 @@ class Odometry:
 
         # calc s
         s = self.clacTotalDist(left, right, radiant)
-        self.totalDist += s
 
         # calc x,y
         self.calcXY(s)
@@ -187,3 +181,26 @@ class Odometry:
     def stealTime(self):
         while not self.btn.any():
             time.sleep(0.01)
+    
+    def setCurrentDirection(self, direction):
+        self.currentDirection = direction
+    
+    def setCoordinates(self, coordinates):
+        self.coordinates = coordinates
+    
+    def pushData(self):
+        grad = self.radians / (2 * math.pi) * 360
+        print(f' Grad: {self.roundToNinety(grad)}, Koordinaten: {self.getTarget()}')
+    
+    def getTarget(self):
+        tempCoord = (0,0)
+        if self.currentDirection == 0:
+            tempCoord = (self.coordinates[0] - self.destination[1], self.coordinates[1] - self.destination[0])
+        elif self.currentDirection == 90:
+            tempCoord = (self.coordinates[0] + self.destination[0], self.coordinates[1] + self.destination[1])
+        elif self.currentDirection == 180:
+            tempCoord = (self.coordinates[0] + self.destination[1], self.coordinates[1] - self.destination[0])
+        elif self.currentDirection == 270:
+            tempCoord = (self.coordinates[0] - self.destination[0], self.coordinates[1] - self.destination[1])
+        return tempCoord
+        
