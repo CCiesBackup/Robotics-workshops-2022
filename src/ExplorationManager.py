@@ -33,6 +33,9 @@ class ExplorationManager:
     def __init__(self):
         self.shortest_path = None
         self.planet = planet.Planet()
+        
+    def update_unknown_paths(self):
+        self.update_current_position(self.current_position)
 
     def set_target(self, target: Tuple[int, int]):
         if target == self.target and not self.path_changed:
@@ -92,9 +95,9 @@ class ExplorationManager:
                     return node[1]
 
     def get_directions(self) -> int:
-        self.last_direction = self.__get_directions_intern()
-        self.path_will_be_explored(self.current_position, self.last_direction)
-        return self.last_direction
+        #self.last_direction = self.__get_directions_intern()
+        #self.path_will_be_explored(self.current_position, self.last_direction)
+        return 270
 
     def path_will_be_explored(self, position, direction):
         unknown_directions_list = self.unknown_paths[position]
@@ -160,11 +163,7 @@ class ExplorationManager:
 
     def get_closest_neighbour_with_unknown_paths(self, position):
 
-        #
-        # TO BE WORKED ON TOMORROW
-        #
-        neighbours = self.get_neighbours(position)
-        eligible_neighbours = []
-        for neighbour in neighbours:
-            if self.has_unexplored_paths(neighbour):
-                eligible_neighbours.append(neighbour)
+        print("Here we come, the doomed function")
+        print(self.unknown_paths_temp)
+        print(self.unknown_paths)
+        return random.choice(self.unknown_paths_temp)

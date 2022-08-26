@@ -47,14 +47,44 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-
-    # communication = CommunicationFactory.getInstance(logger)
+    explorer = ExplorationManager()
+    communication = CommunicationFactory.getInstance(client, logger, explorer)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
 
     # while loop mit Austauschbaren Verhalten
+    # TEST ONlY - BITTE VOR DER PRÜFUNG ENTFERNEN!!!
+    test_planet_name = "Conway"
+    communication.send_test_planet(test_planet_name)
     test = Odometry(0,(0,0))
     test.driving()
+    communication.send_ready()
+    time.sleep(3)
+    test.setCoordinates(explorer.current_position)
+    test.setCurrentDirection(explorer.current_orientation)
+    unknown_paths_absolute = test.getDirections()
+    explorer.push_scanning_results(unknown_paths_absolute)
+    # something
+    direction = explorer.get_directions()
+    communication.send_path_select(explorer.current_position[0], explorer.current_position[1], direction)
+    time.sleep(3)
+    direction = explorer.get_directions()
+
+    while not direction == 128:
+        path_status = 'free'
+        test.turnRelative(direction)
+        test.driving()
+        time.sleep(2)
+        absolute_direction = test.getdirection()
+        coordinates = test.getTarget()
+        
+        if test.somethingInWay:
+            path_status = 'blocked'
+        communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0], coordinates[1], absolute_direction, path_status)
+        time.sleep(3)
+        direction = explorer.get_directions()
+        if not direction == 128:
+            communication.send_path_select(coordinates[0], coordinates[1], direction)
         
 
     print("RIP")
