@@ -47,8 +47,8 @@ class Planet:
         # Tutor: Make sure that the initialized dictionaries are still referenced to __paths
         # (that it actually is call by reference, not call by value)
         # (python is weird)
-        start_value_dictionary[start[1]] = ((target[0], target[1]), weight)
-        target_value_dictionary[target[1]] = ((start[0], start[1]), weight)
+        start_value_dictionary[start[1]] = (target[0], target[1], weight)
+        target_value_dictionary[target[1]] = (start[0], start[1], weight)
 
         if getter_start[1]:
             self.__reference_dicts(start[0], start_value_dictionary)
@@ -80,10 +80,19 @@ class Planet:
     def set_shortest_path_algorithm(self, algorithm: ShortestPathAbstract):
         self.shortest_path_algorithm = algorithm
 
-    def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]) -> \
-            Optional[List[Tuple[Tuple[int, int], Direction]]]:
-        if self.shortest_path_algorithm is None:
-            self.shortest_path_algorithm = ShortestPathAbstract.DijkstraAlgorithm(self.__paths)
+    # Dear tutors: You expect us to return an optional, but we cannot make an optional out of a list
+    # TypeError: typing.Optional requires a single type. Got a list instead.
+    def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]):
+        # we hardcode it here since we will not be using any other shortest path implementation
+        # I want to make sure that nobody forgets it
+        # I will leave the other methods like the algorithm setter just in case
+        self.shortest_path_algorithm = ShortestPathAbstract.DijkstraAlgorithm(self.__paths)
         shortest_path = \
-            self.shortest_path_algorithm.find_shortest_path(start, target, self.__paths)
-        return Optional[shortest_path]
+            self.shortest_path_algorithm.find_shortest_path(start, target)
+        return shortest_path
+
+    # this method will only be used for testing
+    # so that we don't have to tip in all the paths manually
+    def TESTING_set_paths_from_outside(self, graph):
+        print("the graph has been set!")
+        self.__paths = graph

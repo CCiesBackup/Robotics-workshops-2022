@@ -223,7 +223,6 @@ class Communication:
         if payload["type"] == "done":
             self.client.loop_stop()
             self.client.disconnect()
-            print("有一天我会回来……然后我会称霸整个世界!!!!")
             print("Task completed, connection closed!")
 
         else:

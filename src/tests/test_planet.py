@@ -28,8 +28,8 @@ class TestRoboLabPlanet(unittest.TestCase):
 
         # Yeah sorry, I don't like this Direction enum
         test_structure = {
-            (0, 0): {Direction.NORTH: (((0, 1), Direction.SOUTH), 1), Direction.WEST: (((0, 1), Direction.WEST), 1)},
-            (0, 1): {Direction.WEST: (((0, 0), Direction.WEST), 1), Direction.SOUTH: (((0, 0), Direction.NORTH), 1)}
+            (0, 0): {Direction.NORTH: ((0, 1), Direction.SOUTH, 1), Direction.WEST: ((0, 1), Direction.WEST, 1)},
+            (0, 1): {Direction.WEST: ((0, 0), Direction.WEST, 1), Direction.SOUTH: ((0, 0), Direction.NORTH, 1)}
         }
         self.assertEqual(test_structure, self.planet.get_paths(), "Adding paths to the planet doesn't work correctly!")
 

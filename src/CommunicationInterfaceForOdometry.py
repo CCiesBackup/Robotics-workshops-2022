@@ -11,6 +11,19 @@ from CommunicationFactory import CommunicationFactory
 
 class CommunicationExplorationInterface:
 
+    # This dream didn't come true
+    # My goal was to make this class iterable
+    # so that, after the first vertex
+    # the team can iterate over the exploration more or less in such a way:
+
+    # while exploration.hasNext():
+    # odometry.turn_and_follow_line(exploration.next())
+    # exploration.push_scanning_results(odometry.get_scanned_nodes())
+
+    # and these classes would manage all the rest, including the messaging, target setting, exploration etc
+    # and, after the target has been reached or the exploration completed,
+    # the hasNext() method would return false
+
     def __init__(self, client, logger):
         self.explorer = ExplorationManager()
         self.communication = CommunicationFactory.getInstance(client, logger, self.explorer)

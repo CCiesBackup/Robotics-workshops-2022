@@ -56,15 +56,14 @@ def run():
     # TEST ONlY - BITTE VOR DER PRÜFUNG ENTFERNEN!!!
     test_planet_name = "Conway"
     communication.send_test_planet(test_planet_name)
-    test = Odometry(0,(0,0))
-    test.driving()
+    odometer = Odometry(0, (0, 0))
+    odometer.driving()
     communication.send_ready()
     time.sleep(3)
-    test.setCoordinates(explorer.current_position)
-    test.setCurrentDirection(explorer.current_orientation)
-    unknown_paths_absolute = test.getDirections()
-    explorer.push_scanning_results(unknown_paths_absolute)
-    # something
+    odometer.setCoordinates(explorer.current_position)
+    odometer.setCurrentDirection(explorer.current_orientation)
+    unknown_paths_absolute = odometer.getDirections()
+    explorer.push_scanning_results(unknown_paths_absolute, ready=True)
     direction = explorer.get_directions()
     communication.send_path_select(explorer.current_position[0], explorer.current_position[1], direction)
     time.sleep(3)
@@ -72,15 +71,16 @@ def run():
 
     while not direction == 128:
         path_status = 'free'
-        test.turnRelative(direction)
-        test.driving()
+        odometer.turnRelative(direction)
+        odometer.driving()
         time.sleep(2)
-        absolute_direction = test.getdirection()
-        coordinates = test.getTarget()
+        absolute_direction = odometer.getdirection()
+        coordinates = odometer.getTarget()
         
-        if test.somethingInWay:
+        if odometer.somethingInWay:
             path_status = 'blocked'
-        communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0], coordinates[1], absolute_direction, path_status)
+        communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0],
+                                coordinates[1], absolute_direction, path_status)
         time.sleep(3)
         direction = explorer.get_directions()
         if not direction == 128:
