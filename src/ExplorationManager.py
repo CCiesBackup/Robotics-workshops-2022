@@ -5,31 +5,43 @@ import ShortestPathAbstract
 import planet
 from CommunicationFactory import CommunicationFactory
 
-
+# return random path from the paths received by scanning
+# meant to facilitate testing odometry when I'm working on the exploration module
 def get_random(*paths):
     try:
         return random.choice(list(paths))
     except IndexError:
         return 0
 
-
+# The class encapsulating the exploration logic. planet.py serves as a model in the sense of MVC
+# Though admittedly, we haven't been sticking to this concept tightly
 class ExplorationManager:
+    # parameters for handling path select
     path_select_set = False
     path_select_dir = 0
+    # use this one if no path select message has been received
     last_direction = None
     target = None
     target_set = False
+    # the data structures containing the unknown paths
     unknown_paths = {}
     # unknown paths are only updated with the values confirmed by the server
     # hence "unknown_paths_temp" where the scanning results are temporarily stored
     unknown_paths_temp = []
+    # parameters containing the data regarding current position and orientation of the robot
     current_position = (0, 0)
     current_orientation = 0
+    # For path unveiled: if true, we have to recalculate the shortest path
+    # because it is possible that a path that we want to use has just been blocked
     path_changed = False
     directions_for_exploration_calculated = False
+    # directions for exploration
+    # variables for storing data, so that we don't have to calculate the same path
+    # at every node
     exploration_directions = []
     calculated_directions_to_next_neighbour_with_unknown_nodes = False
     path_to_the_next_neighbour_with_unexplored_paths = []
+    # this variable is meant to stop the recursion if a better way has already been found
     search_path_found_weight = float('inf')
 
     def __init__(self):
@@ -38,7 +50,6 @@ class ExplorationManager:
         self.planet = planet.Planet()
 
     def did_I_visit_this_vertex(self, vertex):
-        print(self.visited_vertices)
         return vertex in self.visited_vertices
 
     # I have written it on Nico's laptop
@@ -224,6 +235,7 @@ class ExplorationManager:
         # it signals the need to relaunch the shortest way algorithm
         # if a pathUnveiled message has been received
         self.path_changed = True
+        self.calculated_directions_to_next_neighbour_with_unknown_nodes = False
 
     # if we believe that we've completed the exploration, but it apparently hasn't been the case
     def rebuke(self):

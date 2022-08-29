@@ -38,7 +38,8 @@ class Planet:
                  start: Tuple[Tuple[int, int], Direction],
                  target: Tuple[Tuple[int, int], Direction],
                  weight: int):
-
+        print(f"Added path from: {start[0]}, exit direction:{start[1]}")
+        print(f"Path leads to: {target[0]}, entrance direction:{target[1]}")
         getter_start = self.__get_dict_paths(start[0])
         getter_target = self.__get_dict_paths(target[0])
         start_value_dictionary = getter_start[0]

@@ -184,6 +184,7 @@ class Communication:
                                       (set_off_position, starting_path_direction), -1)
 
     def process_path_payload(self, payload):
+        print("1: OK, PATH MESSAGE RECEIVED SUCCESSFULLY")
         start_x = payload["payload"]["startX"]
         start_y = payload["payload"]["startY"]
         start_direction = payload["payload"]["startDirection"]
@@ -198,8 +199,11 @@ class Communication:
         current_position = (end_x, end_y)
         current_orientation = (end_direction + 180) % 360
         self.explorer.update_current_data(current_position, current_orientation)
+        print("2: OK, COORDINATES UPDATED BY THE SERVER")
+
 
     def process_pathSelect_payload(self, payload):
+        print(f"PATH SELECTED BY THE SERVER. DIRECTION: {payload['payload']['startDirection']}")
         self.explorer.set_path_select(payload["payload"]["startDirection"])
 
     def process_pathUnveiled_payload(self, payload):
