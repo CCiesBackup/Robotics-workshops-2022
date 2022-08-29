@@ -59,7 +59,7 @@ class Communication:
         payload_from_value = payload["from"]
         if payload_from_value == "client":
             return
-        print(f'Received: {message}')
+        print(f'Received: {payload}')
         if payload_from_value == "server":
             if message_type == "planet":
                 self.process_planet_ready_payload(payload)
