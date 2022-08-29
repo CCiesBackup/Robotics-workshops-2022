@@ -56,13 +56,12 @@ class ExplorationManager:
             # type Exception because I'm not really well-versed in Python and its inbuilt exception types
         except Exception:
             unknown_paths_content = []
-
         inner_path_dict = self.planet.get_paths()[self.current_position]
         for direction in self.unknown_paths_temp:
             if direction not in inner_path_dict.keys():
                 unknown_paths_content.append(direction)
-
-
+        if len(unknown_paths_content) > 0:
+            self.unknown_paths[position] = unknown_paths_content
         self.unknown_paths_temp.clear()
         print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
@@ -207,6 +206,7 @@ class ExplorationManager:
 
     # method removing paths from the unknown paths list
     def path_will_be_explored(self, position, direction):
+        print(self.unknown_paths)
         unknown_directions_list = self.unknown_paths[position]
         if direction in unknown_directions_list:
             unknown_directions_list.remove(direction)
