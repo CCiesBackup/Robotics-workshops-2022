@@ -45,12 +45,10 @@ class Planet:
         start_value_dictionary = getter_start[0]
         target_value_dictionary = getter_target[0]
 
-        # Tutor: Make sure that the initialized dictionaries are still referenced to __paths
-        # (that it actually is call by reference, not call by value)
-        # (python is weird)
+        # here we don't have to bind it again because it's a call by reference
         start_value_dictionary[start[1]] = (target[0], target[1], weight)
         target_value_dictionary[target[1]] = (start[0], start[1], weight)
-
+        # but if it's been empty before, we have to reference it with the new dictionary
         if getter_start[1]:
             self.__reference_dicts(start[0], start_value_dictionary)
         if getter_target[1]:
@@ -59,13 +57,16 @@ class Planet:
     def __reference_dicts(self, value: Tuple[int, int],
                           dictionary: Dict[Direction, Tuple[Tuple[int, int], Direction, Weight]]):
         self.__paths[value] = dictionary
-
-    def __get_dict_paths(self, value: Tuple[int, int]):
-        if value in self.__paths:
-            return self.__paths[value], False
+    # the true/false value tells us if we have created a new dictionary variable ({}) or not,
+    # false means that we use an existing one
+    # its important for referencing
+    def __get_dict_paths(self, key: Tuple[int, int]):
+        if key in self.__paths:
+            return self.__paths[key], False
         else:
             return {}, True
 
+    # a getter for paths
     def get_paths(self) -> \
             Dict[Tuple[int, int],
                  Dict[Direction,
@@ -78,10 +79,17 @@ class Planet:
     def print_paths(self):
         print(self.__paths)
 
+
+    # allows to change the used algorithm dynamically during execution of the program
     def set_shortest_path_algorithm(self, algorithm: ShortestPathAbstract):
         self.shortest_path_algorithm = algorithm
 
-    # Dear tutors: You expect us to return an optional, but we cannot make an optional out of a list
+    # the dijkstra returns the shortest path in the following format:
+    # Calculating the shortest path from (6, 1) to (8, -1)
+    # [((6, 1), 270), ((6, 3), 270), ((5, 3), 270), ((4, -1), 0),
+    # ((5, -2), 90), ((6, -2), 90), ((8, -1), None)]
+
+    # Couldn't return an optional:
     # TypeError: typing.Optional requires a single type. Got a list instead.
     def shortest_path(self, start: Tuple[int, int], target: Tuple[int, int]):
         # we hardcode it here since we will not be using any other shortest path implementation

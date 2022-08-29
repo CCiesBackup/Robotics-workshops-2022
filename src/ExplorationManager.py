@@ -50,10 +50,10 @@ class ExplorationManager:
         self.shortest_path = None
         self.planet = planet.Planet()
 
+    # A strikingly simple and simply named function
     def did_I_visit_this_vertex(self, vertex):
         return vertex in self.visited_vertices
 
-    # I have written it on Nico's laptop
     def update_unknown_paths(self):
         print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
@@ -62,6 +62,7 @@ class ExplorationManager:
         position = self.current_position
         # try catch block is here because I do not know if the lookup of a key returns None or an exception
         # if the key is not disponible
+        # And at this stage of the project, I'm afraid to change anything
         try:
             unknown_paths_content = self.unknown_paths[position]
             if unknown_paths_content is None:
@@ -89,22 +90,12 @@ class ExplorationManager:
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
-
-    # def known_but_not_visited(self, position):
-    #     known_but_not_visited_list = []
-    #     inner_dict = self.planet.get_paths()[position]
-    #     for direction in inner_dict:
-    #         if inner_dict[direction][0] not in self.visited_vertices and inner_dict[direction][2] != -1:
-    #             known_but_not_visited_list.append(direction)
-    #         if inner_dict[direction][2] == -1:
-    #             self.directions_to_be_deleted.append(direction)
-    #     return known_but_not_visited_list
-
     def set_target(self, target: Tuple[int, int]):
         if target == self.target:
             return
         if target == self.current_position:
             self.target_reached()
+            # the 128 direction is the stop code for our loop in the main function
             self.set_path_select(128)
             return
         # print(f"New target set! : {target}")
@@ -117,9 +108,9 @@ class ExplorationManager:
         self.path_changed = False
 
     # this method is used to provide this class with the data regarding the unknown paths that
-    # have been discovered
+    # have been discovered by scanning the surroundings of a vertex with the color sensor
     def push_scanning_results(self, directions, ready=False):
-        # the values will be stored in a temporary variable, waiting for position confirmation from
+        # the values will be stored in a temporary list, waiting for confirmation of the position from
         # the server
         self.unknown_paths_temp = directions
         # given that we call the ready function before scanning, the update from there wouldn't work
@@ -275,17 +266,22 @@ class ExplorationManager:
 
     # it returns a direction for exploration
     def explore(self, position: Tuple[int, int]):
+        # it means that there are no unknown paths left in the graph
         if len(self.unknown_paths) == 0:
-            # print(f"unknown paths = {self.unknown_paths}")
-            # print(f"exploration complete! paths = {self.planet.get_paths()}")
             return self.exploration_complete()
+        # if we already know the directions to the closest node with unknown paths,
+        # don't recalculate it, it's been already checked
         if not self.calculated_directions_to_next_neighbour_with_unknown_nodes:
             if self.has_unexplored_paths(position):
                 return self.unknown_paths[position][0]
             else:
+                # If there are no unexplored paths at the current node,
+                # find directions to a node that does have them
                 directions = self.get_closest_neighbour_with_unknown_paths(position)
                 return directions
         else:
+            # We know already the way to the neighbour with unexplored nodes, we just
+            # take the directions from the list
             direction = self.path_to_the_next_neighbour_with_unexplored_paths[0]
             self.path_to_the_next_neighbour_with_unexplored_paths.remove(direction)
             if len(self.path_to_the_next_neighbour_with_unexplored_paths) == 0:
@@ -298,6 +294,7 @@ class ExplorationManager:
         # 128 is our stop code
         return 128
 
+    # unused function
     def get_neighbours(self, position):
         neighbours = []
         neighbours_dict = self.planet.get_paths()[position]
@@ -305,19 +302,23 @@ class ExplorationManager:
             neighbours.append((direction, neighbours_dict[direction][0]))
         return neighbours
 
+    # here we check if a node has unexplored paths around it
     def has_unexplored_paths(self, position):
         if position in self.unknown_paths.keys() and len(self.unknown_paths[position]) != 0:
             return True
         else:
             return False
 
+    # here we convert the entry direction of a node into the direction we're looking towards
+    # and the other way around
     def get_reverse_direction(self, direction):
         return (direction + 180) % 360
 
+    # the name says it all
     def get_closest_neighbour_with_unknown_paths(self, position):
         recursion_results = {}
         direction_dict = self.planet.get_paths()[position]
-        # at first, we use this function because we don't want to use costly recursion if the
+        # at first, we use this simple loop because we don't want to use the costly recursion if the
         # sought neighbour is directly next to the current position
         for direction in direction_dict:
             neigh_position = direction_dict[direction][0]
@@ -325,6 +326,8 @@ class ExplorationManager:
                 return direction
         ###########
         # If we got here: No direct neighbour has unexplored paths
+        # Here we look recursively for the shortest path nearby to a node that has some unexplored
+        # paths
         for direction in direction_dict:
             neigh_position = direction_dict[direction][0]
             neigh_weight = direction_dict[direction][2]
@@ -332,12 +335,13 @@ class ExplorationManager:
                 neigh_position, neigh_weight, []
             )
 
+        # here we extract the shortest path from the received data (recursion has been completed
         smallest_weight_direction = (999999, [])
         for direction in recursion_results:
             new_weight = recursion_results[direction][0]
             if new_weight < smallest_weight_direction[0]:
                 smallest_weight_direction = (new_weight, direction)
-
+        # Here we check if the way has really been found
         if smallest_weight_direction[0] < 99999:
             desired_direction = smallest_weight_direction[1]
             self.path_to_the_next_neighbour_with_unexplored_paths = \
@@ -345,6 +349,14 @@ class ExplorationManager:
             self.calculated_directions_to_next_neighbour_with_unknown_nodes = True
             return desired_direction
         else:
+            # Ok, there is no node with unexplored paths nearby
+            # we can't just use a recursive function over the entire big planet
+            # because it would easily lead to stack overflow
+            # so, just calculate the shortest way using dijkstra to a node with unexplored paths
+            # given that the recursion failed, the closest node with unexplored paths is over 6 nodes away
+            # therefore this solution really makes sense from the mathematical perspective
+            # recursive search time complexity grows exponentially (each function calls 3 next functions)
+            # so its 3^n (3 to the power of n)
             some_target_node = random.choice(list(self.unknown_paths.keys()))
             self.calculated_directions_to_next_neighbour_with_unknown_nodes = True
             shortest_path = self.planet.shortest_path(position, some_target_node)
@@ -357,6 +369,7 @@ class ExplorationManager:
         # I believe it's the maximum that our brick can handle
         # if the target hasn't been found, we will use another method,
         # efficient only at high distances
+        # the first node has the historial of length 0, so it gives a total range of 6 nodes
 
         # The recursion will not continue if we already know a more efficient path
         if len(direction_history) > 5 or weight > self.search_path_found_weight:
@@ -385,6 +398,7 @@ class ExplorationManager:
                 smallest_vertex = tuple_x
         return smallest_vertex
 
+    # the dijkstra returns shortest ways in the following format:
     # Calculating the shortest path from (6, 1) to (8, -1)
     # [((6, 1), 270), ((6, 3), 270), ((5, 3), 270), ((4, -1), 0),
     # ((5, -2), 90), ((6, -2), 90), ((8, -1), None)]

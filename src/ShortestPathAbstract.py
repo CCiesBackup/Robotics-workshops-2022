@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Dict
 
-
+# Strategy pattern in action
 class ShortestPathAbstract(ABC):
     @abstractmethod
     def find_shortest_path(self, start, target) -> List[Tuple[Tuple[int, int], int]]:
@@ -17,6 +17,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
     path_data = {}
 
     def __init__(self, paths):
+        # here we filter out the paths with the weight -1
         to_be_deleted = []
         paths
         for node in paths:
@@ -29,6 +30,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
         for position in to_be_deleted:
             paths[position[0]].pop(position[1])
         self.paths = paths
+        # in the beginning we don't know the way, so every node has the weight of infinity
         for node in paths:
             self.path_data[node] = [False, float('inf'), None]
 
@@ -47,6 +49,8 @@ class DijkstraAlgorithm(ShortestPathAbstract):
         target_found = False
         current_vertex = start
         while not target_found:
+            # It shows how the dijkstra algorithm works
+            # It is just about updating the estimates and choosing the next vertex to consider
             self.__update_estimates(current_vertex, target)
             current_vertex = self.__choose_next_vertex(current_vertex)
             if current_vertex == target:
@@ -68,6 +72,8 @@ class DijkstraAlgorithm(ShortestPathAbstract):
             self.path_data[next_vertex][0] = True
             return next_vertex
 
+    # for reasons of scarce robot memory, we store just the vertex that updated the next one and then
+    # reconstruct the way to the start using this data
     def __backtrace(self, target_vertex):
         response = []
         input_vertex = None
