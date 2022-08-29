@@ -26,6 +26,6 @@ if __name__ == '__main__':
     explorer.update_current_position((5, -2))
     explorer.update_current_position((5, -2))
     explorer.set_target((4, -1))
-    print(explorer.get_directions())
+    # print(explorer.get_directions())
     explorer.update_current_position((4, -1))
-    print(explorer.get_directions())
+    # print(explorer.get_directions())

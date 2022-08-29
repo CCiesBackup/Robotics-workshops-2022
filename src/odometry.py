@@ -74,13 +74,13 @@ class Odometry:
         self.stealTime()
 
     def getDirection(self):
-        alpha = -(self.radians / (2 * math.pi) * 360)
-        print(f'Alpha: {alpha}')
-        return (self.roundToNinety(alpha) + self.currentDirection) % 360
+        alpha = self.radians / (2 * math.pi) * 360
+        return (self.currentDirection - self.roundToNinety(alpha)) % 360
     
     def driving(self):
         self.reset()
         loop = True
+        # print(f'current direction: {self.currentDirection}, dest: {self.destination}')
         while loop:
             if self.ultrasonic.isSomethingInMyWay():
                 ev3.Sound.play('/home/robot/src/assets/quack.wav')
@@ -106,20 +106,18 @@ class Odometry:
                 self.driveLine(color)
                 
     def findPath(self):
-        print(f'Current Direction: {self.currentDirection}')
         for index in range(0,4):
             self.motor.turnRight()
             while self.left.is_running:
                 if self.farbsensor.isBlack():
                     self.paths[Direction[self.directives[index]]] = True
-        print(f'Paths gefunden: {self.paths}')
         return
     
     def turnAround(self):
         temp = 0
-        if self.roundToNinety(self.getdirection()) == 90:
+        if self.roundToNinety(self.getDirection()) == 90:
             temp = 30
-        if self.getdirection() == -90:
+        if self.getDirection() == -90:
             temp = -20
         self.motor.curve(self.motor.ninety * 2 + temp)
         time.sleep(2.25)
@@ -127,13 +125,14 @@ class Odometry:
     def driveAtPoint(self):
         self.motor.tare()
         self.motor.driveSevenCM()
-        ev3.Sound.beep()
         
         # calc Data
         self.radians = 0
         list(map(self.setCalculatedData, self.data))
+        # print(f'Drehung: {self.radians / (2 * math.pi) * 360}')
         self.destination = (round(self.destination[0]), round(self.destination[1]))
         self.destination = (self.destination[0] / 50, self.destination[1] / 50)
+        # print(f'Destination: {self.destination}')
     
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
@@ -171,7 +170,7 @@ class Odometry:
         ds = (self.calcDist(dr) + self.calcDist(dl)) / 2
         if radiant == 0:
             return ds
-        return 2 * (ds /radiant) * (radiant / 2)
+        return 2 * (ds /radiant) * math.sin(radiant / 2)
         
     def calcDist(self, degree):
         return degree * self.distPerDegree
@@ -227,6 +226,7 @@ class Odometry:
         self.destination = (0,0)
         self.radians = 0
         self.somethingInWay = False
+        self.motor.reset()
     
     def getDirections(self):
         directions_list = []
@@ -236,15 +236,14 @@ class Odometry:
         return directions_list
     
     def turnRelative(self, position):
-        print(f'Position: {position}, Current Direction: {self.currentDirection}')
         temp = int(((position - self.currentDirection) % 360) // 90)
         if temp < 0:
             for index in range(0, -temp):
                 self.motor.turnLeft()
-                time.sleep(0.5)
+                time.sleep(1)
         else:
             for index in range(0, temp):
                 self.motor.turnRight()
-                time.sleep(0.5)
+                time.sleep(1)
         self.currentDirection = position
         

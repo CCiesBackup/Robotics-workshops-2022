@@ -67,7 +67,6 @@ def run():
     # Koordinaten, Blickrichtung setzen
     odometer.setCoordinates(explorer.current_position)
     odometer.setCurrentDirection(explorer.current_orientation)
-    print(f'Richtung: {odometer.currentDirection}, Koordinaten: {odometer.coordinates}')
     unknown_paths_absolute = odometer.getDirections()
     # pushen
     explorer.push_scanning_results(unknown_paths_absolute, ready=True)
@@ -78,25 +77,24 @@ def run():
 
     while not direction == 128:
         path_status = 'free'
+        ev3.Sound.beep()
         odometer.turnRelative(direction)
         time.sleep(1)
         odometer.driving()
-        absolute_direction = odometer.getDirection()
+        absolute_direction = explorer.get_reverse_direction(odometer.getDirection())
         coordinates = odometer.getTarget()
-        print(f'Richtung: {absolute_direction}, Koordinaten: {coordinates}')
         if odometer.somethingInWay:
             path_status = 'blocked'
         if not explorer.did_I_visit_this_vertex(coordinates):
             odometer.findPath()
-            print(f'Directions: {odometer.getDirections()}')
             explorer.push_scanning_results(odometer.getDirections())
-        print(f'Richtung(old): {direction}, Koordinaten(old): {explorer.current_position}')
-        print(f'Richtung(new): {absolute_direction}, Koordinaten(new): {coordinates}')
         communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0],
                                 coordinates[1], absolute_direction, path_status)
         # time.sleep(4)
         odometer.setCoordinates(explorer.current_position)
         odometer.setCurrentDirection(explorer.current_orientation)
+        print(f'Korrigierte Koordinaten: {odometer.coordinates}')
+        print(f'Korrigierte Direction: {odometer.currentDirection}')
         direction = explorer.get_directions()
         if not direction == 128:
             communication.send_path_select(odometer.coordinates[0], odometer.coordinates[1], direction)

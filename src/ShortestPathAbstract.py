@@ -39,7 +39,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
     def find_shortest_path(self, start, target) -> List[Tuple[Tuple[int, int], int]]:
 
         self.path_data[start] = (True, 0, None)
-        print(f"Calculating the shortest path from {start} to {target}")
+        # print(f"Calculating the shortest path from {start} to {target}")
         # not checking for the start vertex for the sake of reducing the comparison amount
         if target not in self.paths.keys():
             return None

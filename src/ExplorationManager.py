@@ -41,6 +41,7 @@ class ExplorationManager:
     exploration_directions = []
     calculated_directions_to_next_neighbour_with_unknown_nodes = False
     path_to_the_next_neighbour_with_unexplored_paths = []
+    directions_to_be_deleted = []
     # this variable is meant to stop the recursion if a better way has already been found
     search_path_found_weight = float('inf')
 
@@ -54,7 +55,7 @@ class ExplorationManager:
 
     # I have written it on Nico's laptop
     def update_unknown_paths(self):
-        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        # print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
             # print("length is 0. return from update_unknown_paths")
             return
@@ -77,10 +78,14 @@ class ExplorationManager:
         # but we don't know if it doesn't have any unexplored paths at the second end
         for direction in self.known_but_not_visited(self.current_position):
             unknown_paths_content.append(direction)
+        for direction in self.directions_to_be_deleted:
+            if direction in unknown_paths_content:
+                unknown_paths_content.remove(direction)
+        self.directions_to_be_deleted.clear()
         if len(unknown_paths_content) > 0:
             self.unknown_paths[position] = unknown_paths_content
         self.unknown_paths_temp.clear()
-        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        # print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
@@ -91,6 +96,8 @@ class ExplorationManager:
         for direction in inner_dict:
             if inner_dict[direction][0] not in self.visited_vertices and inner_dict[direction][2] != -1:
                 known_but_not_visited_list.append(direction)
+            if inner_dict[direction][2] == -1:
+                self.directions_to_be_deleted.append(direction)
         return known_but_not_visited_list
 
     def set_target(self, target: Tuple[int, int]):
@@ -233,6 +240,8 @@ class ExplorationManager:
     # method removing paths from the unknown paths list
     def path_will_be_explored(self, position, direction):
         # print(self.unknown_paths)
+        if position not in self.unknown_paths.keys():
+            return
         unknown_directions_list = self.unknown_paths[position]
         if direction in unknown_directions_list:
             unknown_directions_list.remove(direction)
@@ -265,8 +274,8 @@ class ExplorationManager:
     # it returns a direction for exploration
     def explore(self, position: Tuple[int, int]):
         if len(self.unknown_paths) == 0:
-            print(f"unknown paths = {self.unknown_paths}")
-            print(f"exploration complete! paths = {self.planet.get_paths()}")
+            # print(f"unknown paths = {self.unknown_paths}")
+            # print(f"exploration complete! paths = {self.planet.get_paths()}")
             return self.exploration_complete()
         if not self.calculated_directions_to_next_neighbour_with_unknown_nodes:
             if self.has_unexplored_paths(position):

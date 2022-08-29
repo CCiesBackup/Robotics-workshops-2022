@@ -224,6 +224,9 @@ class Communication:
         end = ((end_x, end_y), end_direction)
         weight = (-1) if payload["payload"]["pathStatus"] == "blocked" else payload["payload"]["pathWeight"]
         self.explorer.add_path_intern(start, end, weight)
+        if weight == -1:
+            if (start_x, start_y) in self.explorer.unknown_paths.keys():
+                self.explorer.unknown_paths[(start_x, start_y)].remove(start_direction)
 
     def process_done_payload(self, payload):
         if payload["type"] == "done":

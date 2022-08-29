@@ -28,8 +28,8 @@ class Motor(object):
         self.left.reset()
         self.right.reset()
         
-        self.left.stop_action = "brake"
-        self.right.stop_action = "brake"
+        self.left.stop_action = "hold"
+        self.right.stop_action = "hold"
         
         self.setCommand("run-forever")
     
@@ -107,3 +107,11 @@ class Motor(object):
     def setOffset(self, black, white):
         self.valueRangeBlack = black - self.offset
         self.valueRangeWhite = white - self.offset
+    
+    def reset(self):
+        self.left.reset()
+        self.right.reset()
+        
+        self.left.stop_action = "hold"
+        self.right.stop_action = "hold"
+
