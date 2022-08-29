@@ -67,12 +67,13 @@ def run():
     # Koordinaten, Blickrichtung setzen
     odometer.setCoordinates(explorer.current_position)
     odometer.setCurrentDirection(explorer.current_orientation)
+    print(f'Richtung: {odometer.currentDirection}, Koordinaten: {odometer.coordinates}')
     unknown_paths_absolute = odometer.getDirections()
     # pushen
     explorer.push_scanning_results(unknown_paths_absolute, ready=True)
     direction = explorer.get_directions()
     communication.send_path_select(explorer.current_position[0], explorer.current_position[1], direction)
-    time.sleep(3)
+    # time.sleep(3)
     direction = explorer.get_directions(path_select_check=True)
 
     while not direction == 128:
@@ -82,21 +83,24 @@ def run():
         odometer.driving()
         absolute_direction = odometer.getDirection()
         coordinates = odometer.getTarget()
+        print(f'Richtung: {absolute_direction}, Koordinaten: {coordinates}')
         if odometer.somethingInWay:
             path_status = 'blocked'
         if not explorer.did_I_visit_this_vertex(coordinates):
             odometer.findPath()
             print(f'Directions: {odometer.getDirections()}')
             explorer.push_scanning_results(odometer.getDirections())
+        print(f'Richtung(old): {direction}, Koordinaten(old): {explorer.current_position}')
+        print(f'Richtung(new): {absolute_direction}, Koordinaten(new): {coordinates}')
         communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0],
                                 coordinates[1], absolute_direction, path_status)
-        time.sleep(4)
+        # time.sleep(4)
         odometer.setCoordinates(explorer.current_position)
         odometer.setCurrentDirection(explorer.current_orientation)
         direction = explorer.get_directions()
         if not direction == 128:
-            communication.send_path_select(coordinates[0], coordinates[1], direction)
-            time.sleep(4)
+            communication.send_path_select(odometer.coordinates[0], odometer.coordinates[1], direction)
+            # time.sleep(4)
             direction = explorer.get_directions(path_select_check=True)
         
     # schönerer Beepsound

@@ -54,9 +54,9 @@ class ExplorationManager:
 
     # I have written it on Nico's laptop
     def update_unknown_paths(self):
-        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        # print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
-            print("length is 0. return from update_unknown_paths")
+            # print("length is 0. return from update_unknown_paths")
             return
         position = self.current_position
         # try catch block is here because I do not know if the lookup of a key returns None or an exception
@@ -76,8 +76,9 @@ class ExplorationManager:
         if len(unknown_paths_content) > 0:
             self.unknown_paths[position] = unknown_paths_content
         else:
-            print("length is 0. return from update_unknown_paths")
-        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+            ''
+        #     print("length is 0. return from update_unknown_paths")
+        # print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
@@ -88,7 +89,7 @@ class ExplorationManager:
             self.target_reached()
             self.set_path_select(128)
             return
-        print(f"New target set! : {target}")
+        # print(f"New target set! : {target}")
         self.target_set = True
         self.target = target
         self.shortest_path = self.planet.shortest_path(self.current_position, target)
@@ -221,7 +222,7 @@ class ExplorationManager:
 
     # method removing paths from the unknown paths list
     def path_will_be_explored(self, position, direction):
-        print(self.unknown_paths)
+        # print(self.unknown_paths)
         unknown_directions_list = self.unknown_paths[position]
         if direction in unknown_directions_list:
             unknown_directions_list.remove(direction)
@@ -242,9 +243,7 @@ class ExplorationManager:
 
     # if we believe that we've completed the exploration, but it apparently hasn't been the case
     def rebuke(self):
-        for i in range(3):
-            print("Sorry, we have to work on the sensors and scanning paths again")
-            print("ERROR! " * 5)
+        pass
 
     # a method to add some paths to the underlying data structure
     def add_path_intern(self,

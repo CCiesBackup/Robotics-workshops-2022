@@ -3,6 +3,7 @@
 # Attention: Do not import the ev3dev.ev3 module in this file
 import json
 import ssl
+import time
 from typing import Tuple, Any
 
 from MessageModelManager import OutgoingMessages
@@ -58,7 +59,7 @@ class Communication:
         payload_from_value = payload["from"]
         if payload_from_value == "client":
             return
-        print(f"Following data has been received: {payload}")
+        print(f'Received: {message}')
         if payload_from_value == "server":
             if message_type == "planet":
                 self.process_planet_ready_payload(payload)
@@ -90,10 +91,7 @@ class Communication:
             else:
                 self.process_unknown_payload(payload)
         elif payload_from_value == "debug":
-            if self.exam_mode:
-                print("Received a debug message in the process of the exam. Weird occurrence...")
-            else:
-                self.process_syntax_payload(payload)
+            self.process_syntax_payload(payload)
         else:
             self.process_unknown_payload(payload)
 
@@ -107,6 +105,7 @@ class Communication:
         self.logger.debug(json.dumps(message, indent=2))
         encoded_message = json.dumps(message).encode('utf-8')
         self.client.publish(topic, payload=encoded_message, qos=2, retain=False)
+        time.sleep(3)
 
     def send_ready(self):
         self.send_message(self.topics['general'], self.msg_models.ready())
@@ -165,12 +164,13 @@ class Communication:
         self.explorer.set_target(target)
 
     def process_testPlanet_payload(self, payload):
-        print(f"Ok, test planet set! Testing on the planet: {payload['payload']['planetName']} ")
+        ''
+        # print(f"Ok, test planet set! Testing on the planet: {payload['payload']['planetName']} ")
 
     def process_planet_ready_payload(self, payload):
         self.planet_name = payload["payload"]["planetName"]
         self.topics['planet'] = "planet/" + payload["payload"]["planetName"] + "/202"
-        print(f"Subscribing to the topic: {self.topics['planet']}")
+        # print(f"Subscribing to the topic: {self.topics['planet']}")
         self.client.subscribe(self.topics['planet'], qos=2)
 
         set_off_position = (payload["payload"]["startX"], payload["payload"]["startY"])
@@ -184,7 +184,7 @@ class Communication:
                                       (set_off_position, starting_path_direction), -1)
 
     def process_path_payload(self, payload):
-        print("1: OK, PATH MESSAGE RECEIVED SUCCESSFULLY")
+        # print("1: OK, PATH MESSAGE RECEIVED SUCCESSFULLY")
         start_x = payload["payload"]["startX"]
         start_y = payload["payload"]["startY"]
         start_direction = payload["payload"]["startDirection"]
@@ -199,11 +199,11 @@ class Communication:
         current_position = (end_x, end_y)
         current_orientation = (end_direction + 180) % 360
         self.explorer.update_current_data(current_position, current_orientation)
-        print("2: OK, COORDINATES UPDATED BY THE SERVER")
+        # print("2: OK, COORDINATES UPDATED BY THE SERVER")
 
 
     def process_pathSelect_payload(self, payload):
-        print(f"PATH SELECTED BY THE SERVER. DIRECTION: {payload['payload']['startDirection']}")
+        # print(f"PATH SELECTED BY THE SERVER. DIRECTION: {payload['payload']['startDirection']}")
         self.explorer.set_path_select(payload["payload"]["startDirection"])
 
     def process_pathUnveiled_payload(self, payload):

@@ -74,7 +74,8 @@ class Odometry:
         self.stealTime()
 
     def getDirection(self):
-        alpha = self.radians / (2 * math.pi) * 360
+        alpha = -(self.radians / (2 * math.pi) * 360)
+        print(f'Alpha: {alpha}')
         return (self.roundToNinety(alpha) + self.currentDirection) % 360
     
     def driving(self):
@@ -137,7 +138,6 @@ class Odometry:
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
         distTupel = self.getLocalDegree(temp[0], temp[1])
-        self.radians += self.calcDirection(distTupel[0], distTupel[1])
         self.data.append(distTupel)
     
     def getLocalDegree(self, left, right):
