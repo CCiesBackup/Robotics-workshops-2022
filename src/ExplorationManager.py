@@ -42,6 +42,7 @@ class ExplorationManager:
 
     # I have written it on Nico's laptop
     def update_unknown_paths(self):
+        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
             return
         position = self.current_position
@@ -54,9 +55,14 @@ class ExplorationManager:
         except Exception:
             unknown_paths_content = []
 
-        self.unknown_paths[position] = \
-            self.list_union_no_repetitions(self.unknown_paths_temp, unknown_paths_content)
+        inner_path_dict = self.planet.get_paths()[self.current_position]
+        for direction in self.unknown_paths_temp:
+            if direction not in inner_path_dict.keys():
+                unknown_paths_content.append(direction)
+
+
         self.unknown_paths_temp.clear()
+        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
@@ -97,9 +103,8 @@ class ExplorationManager:
         # So, the right way of doing it is push_scanning_results -> send_path_message
         # and the path message reception will call this function and the one below
         # moving the unknown paths from the temp list into the main data structure
-        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+
         self.update_unknown_paths()
-        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # a simple setter for the current orientation
     def update_current_orientation(self, current_orientation: int):

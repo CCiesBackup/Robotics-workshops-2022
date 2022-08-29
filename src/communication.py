@@ -180,6 +180,10 @@ class Communication:
         # self.explorer.current_position = set_off_position
         # self.explorer.current_orientation = set_off_orientation
         self.explorer.update_current_data(set_off_position, set_off_orientation)
+        # Add the starting path as a blocked path
+        starting_path_direction = self.explorer.get_reverse_direction(set_off_orientation)
+        self.explorer.add_path_intern((set_off_position, starting_path_direction),
+                                      (set_off_position, starting_path_direction), -1)
 
     def process_path_payload(self, payload):
         start_x = payload["payload"]["startX"]
