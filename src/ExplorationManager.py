@@ -38,6 +38,7 @@ class ExplorationManager:
         self.planet = planet.Planet()
 
     def did_I_visit_this_vertex(self, vertex):
+        print(self.visited_vertices)
         return vertex in self.visited_vertices
 
     # I have written it on Nico's laptop

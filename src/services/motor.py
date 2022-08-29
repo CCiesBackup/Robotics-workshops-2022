@@ -54,6 +54,11 @@ class Motor(object):
     def turnRight(self):
         self.curve(self.ninety)
     
+    def turnLeft(self):
+        self.setPositionSP(self.ninety)
+        self.setspeed(-500, 500)
+        self.setCommand("run-to-rel-pos")
+    
     def driveLine(self, lightValue):
         self.error = lightValue - self.offset
         self.integral += self.error
@@ -91,10 +96,6 @@ class Motor(object):
     def setPositionSP(self, position):
         self.left.position_sp = position
         self.right.position_sp = position
-    
-    def driveToDirection(self, currentDirection, destination):
-        temp = ((destination - currentDirection) / 90) * self.ninety
-        self.curve(temp)
     
     def curve(self, position):
         self.left.position_sp = -position

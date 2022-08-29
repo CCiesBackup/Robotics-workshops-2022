@@ -70,7 +70,6 @@ class Odometry:
         self.farbsensor.setColors(black, blue, red, yellow)
         self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
         time.sleep(1)
-        print(f'Schwarz: {black}, Blau: {blue}, Rot: {red}, Weiß: {white}, Yellow: {yellow}')
         print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
         self.stealTime()
 
@@ -106,13 +105,13 @@ class Odometry:
                 self.driveLine(color)
                 
     def findPath(self):
+        print(f'Current Direction: {self.currentDirection}')
         for index in range(0,4):
             self.motor.turnRight()
-            time.sleep(0.5)
             while self.left.is_running:
                 if self.farbsensor.isBlack():
                     self.paths[Direction[self.directives[index]]] = True
-        print(self.paths)
+        print(f'Paths gefunden: {self.paths}')
         return
     
     def turnAround(self):
@@ -127,7 +126,6 @@ class Odometry:
     def driveAtPoint(self):
         self.motor.tare()
         self.motor.driveSevenCM()
-        self.findPath()
         ev3.Sound.beep()
         
         # calc Data
@@ -135,7 +133,6 @@ class Odometry:
         list(map(self.setCalculatedData, self.data))
         self.destination = (round(self.destination[0]), round(self.destination[1]))
         self.destination = (self.destination[0] / 50, self.destination[1] / 50)
-        print(self.paths)
     
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
@@ -212,16 +209,21 @@ class Odometry:
     def getTarget(self):
         tempCoord = (0,0)
         if self.currentDirection == 0:
-            tempCoord = (self.coordinates[0] - self.destination[1], self.coordinates[1] + self.destination[0])
+            tempCoord = ((self.coordinates[0] - self.destination[1]), self.coordinates[1] + self.destination[0])
         elif self.currentDirection == 90:
             tempCoord = (self.coordinates[0] + self.destination[0], self.coordinates[1] + self.destination[1])
         elif self.currentDirection == 180:
             tempCoord = (self.coordinates[0] + self.destination[1], self.coordinates[1] - self.destination[0])
         elif self.currentDirection == 270:
             tempCoord = (self.coordinates[0] - self.destination[0], self.coordinates[1] - self.destination[1])
-        return tempCoord
+        return (round(tempCoord[0]), round(tempCoord[1]))
     
     def reset(self):
+        self.paths = {
+        Direction.EAST:False,
+        Direction.SOUTH:False,
+        Direction.WEST:False,
+        Direction.NORTH:False}
         self.destination = (0,0)
         self.radians = 0
         self.somethingInWay = False
@@ -234,8 +236,15 @@ class Odometry:
         return directions_list
     
     def turnRelative(self, position):
-        print('Turn Around')
-        temp = ((self.currentDirection + position) % 360) / 90
-        self.motor.curve(self.motor.ninety * temp)
-        time.sleep(2.25)
+        print(f'Position: {position}, Current Direction: {self.currentDirection}')
+        temp = int(((position - self.currentDirection) % 360) // 90)
+        if temp < 0:
+            for index in range(0, -temp):
+                self.motor.turnLeft()
+                time.sleep(0.5)
+        else:
+            for index in range(0, temp):
+                self.motor.turnRight()
+                time.sleep(0.5)
+        self.currentDirection = position
         

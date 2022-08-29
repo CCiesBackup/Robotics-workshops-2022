@@ -114,9 +114,7 @@ class Communication:
             self.send_message(self.topics['tests'], self.msg_models.ready())
 
     def send_test_planet(self, planet_name):
-        self.exam_mode = False
         self.planet_name = planet_name
-        self.client.subscribe(self.topics['tests'], qos=2)
         self.send_message(self.topics['general'], self.msg_models.test_planet(planet_name))
 
     def send_path(self, start_x, start_y, start_d, end_x, end_y, end_d, path_status):
