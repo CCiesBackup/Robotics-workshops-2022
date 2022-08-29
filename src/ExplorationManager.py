@@ -54,7 +54,7 @@ class ExplorationManager:
 
     # I have written it on Nico's laptop
     def update_unknown_paths(self):
-        # print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
             # print("length is 0. return from update_unknown_paths")
             return
@@ -73,15 +73,26 @@ class ExplorationManager:
         for direction in self.unknown_paths_temp:
             if direction not in inner_path_dict.keys():
                 unknown_paths_content.append(direction)
+        # If we get a path with pathUnveiled, we know that it is there
+        # but we don't know if it doesn't have any unexplored paths at the second end
+        for direction in self.known_but_not_visited(self.current_position):
+            unknown_paths_content.append(direction)
         if len(unknown_paths_content) > 0:
             self.unknown_paths[position] = unknown_paths_content
-        else:
-            ''
-        #     print("length is 0. return from update_unknown_paths")
-        # print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        self.unknown_paths_temp.clear()
+        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
+
+    def known_but_not_visited(self, position):
+        known_but_not_visited_list = []
+        inner_dict = self.planet.get_paths()[position]
+        for direction in inner_dict:
+            if inner_dict[direction][0] not in self.visited_vertices:
+                known_but_not_visited_list.append(direction)
+        return known_but_not_visited_list
+
     def set_target(self, target: Tuple[int, int]):
         if target == self.target:
             return
@@ -109,7 +120,6 @@ class ExplorationManager:
             self.update_unknown_paths()
 
     def update_current_position(self, current_position: Tuple[int, int]):
-        self.unknown_paths_temp.clear()
         self.current_position = current_position
         # Quick fix: It will be useful to track visited vertices for optimization purposes
         # We need it because otherwise we wouldn't be able to differentiate the paths discovered by
@@ -255,6 +265,8 @@ class ExplorationManager:
     # it returns a direction for exploration
     def explore(self, position: Tuple[int, int]):
         if len(self.unknown_paths) == 0:
+            print(f"unknown paths = {self.unknown_paths}")
+            print(f"exploration complete! paths = {self.planet.get_paths()}")
             return self.exploration_complete()
         if not self.calculated_directions_to_next_neighbour_with_unknown_nodes:
             if self.has_unexplored_paths(position):
