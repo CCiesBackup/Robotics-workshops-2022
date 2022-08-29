@@ -89,7 +89,7 @@ class ExplorationManager:
         known_but_not_visited_list = []
         inner_dict = self.planet.get_paths()[position]
         for direction in inner_dict:
-            if inner_dict[direction][0] not in self.visited_vertices:
+            if inner_dict[direction][0] not in self.visited_vertices and inner_dict[direction][2] != -1:
                 known_but_not_visited_list.append(direction)
         return known_but_not_visited_list
 
