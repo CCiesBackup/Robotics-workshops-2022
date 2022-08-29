@@ -46,6 +46,8 @@ class ExplorationManager:
         if len(self.unknown_paths_temp) == 0:
             return
         position = self.current_position
+        # try catch block is here because I do not know if the lookup of a key returns None or an exception
+        # if the key is not disponible
         try:
             unknown_paths_content = self.unknown_paths[position]
             if unknown_paths_content is None:
