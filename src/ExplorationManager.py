@@ -56,6 +56,7 @@ class ExplorationManager:
     def update_unknown_paths(self):
         print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
+            print("length is 0. return from update_unknown_paths")
             return
         position = self.current_position
         # try catch block is here because I do not know if the lookup of a key returns None or an exception
@@ -74,7 +75,8 @@ class ExplorationManager:
                 unknown_paths_content.append(direction)
         if len(unknown_paths_content) > 0:
             self.unknown_paths[position] = unknown_paths_content
-        self.unknown_paths_temp.clear()
+        else:
+            print("length is 0. return from update_unknown_paths")
         print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
@@ -106,6 +108,7 @@ class ExplorationManager:
             self.update_unknown_paths()
 
     def update_current_position(self, current_position: Tuple[int, int]):
+        self.unknown_paths_temp.clear()
         self.current_position = current_position
         # Quick fix: It will be useful to track visited vertices for optimization purposes
         # We need it because otherwise we wouldn't be able to differentiate the paths discovered by
