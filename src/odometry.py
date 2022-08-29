@@ -127,7 +127,7 @@ class Odometry:
         self.motor.driveSevenCM()
         
         # calc Data
-        self.radians = 0
+        self.radians = self.getGamma()
         list(map(self.setCalculatedData, self.data))
         # print(f'Drehung: {self.radians / (2 * math.pi) * 360}')
         self.destination = (round(self.destination[0]), round(self.destination[1]))
@@ -206,16 +206,16 @@ class Odometry:
         self.coordinates = coordinates
     
     def getTarget(self):
-        tempCoord = (0,0)
-        if self.currentDirection == 0:
-            tempCoord = ((self.coordinates[0] - self.destination[1]), self.coordinates[1] + self.destination[0])
-        elif self.currentDirection == 90:
-            tempCoord = (self.coordinates[0] + self.destination[0], self.coordinates[1] + self.destination[1])
-        elif self.currentDirection == 180:
-            tempCoord = (self.coordinates[0] + self.destination[1], self.coordinates[1] - self.destination[0])
-        elif self.currentDirection == 270:
-            tempCoord = (self.coordinates[0] - self.destination[0], self.coordinates[1] - self.destination[1])
-        return (round(tempCoord[0]), round(tempCoord[1]))
+        # tempCoord = (0,0)
+        # if self.currentDirection == 0:
+        #     tempCoord = ((self.coordinates[0] - self.destination[1]), self.coordinates[1] + self.destination[0])
+        # elif self.currentDirection == 90:
+        #     tempCoord = (self.coordinates[0] + self.destination[0], self.coordinates[1] + self.destination[1])
+        # elif self.currentDirection == 180:
+        #     tempCoord = (self.coordinates[0] + self.destination[1], self.coordinates[1] - self.destination[0])
+        # elif self.currentDirection == 270:
+        #     tempCoord = (self.coordinates[0] - self.destination[0], self.coordinates[1] - self.destination[1])
+        return (round(self.coordinates[0] + self.destination[0]), round(self.coordinates[1] + self.destination[1]))
     
     def reset(self):
         self.paths = {
@@ -246,4 +246,7 @@ class Odometry:
                 self.motor.turnRight()
                 time.sleep(1)
         self.currentDirection = position
+    
+    def getGamma(self):
+        return self.currentDirection / 360 * 2 * math.pi
         

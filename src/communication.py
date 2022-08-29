@@ -59,7 +59,7 @@ class Communication:
         payload_from_value = payload["from"]
         if payload_from_value == "client":
             return
-        print(f'Received: {payload}')
+        # print(f'Received: {payload}')
         if payload_from_value == "server":
             if message_type == "planet":
                 self.process_planet_ready_payload(payload)
@@ -100,7 +100,7 @@ class Communication:
     # In order to keep the logging working you must provide a topic string and
     # an already encoded JSON-Object as message.
     def send_message(self, topic, message):
-        print(f" sent {message} to {topic} ")
+        # print(f" sent {message} to {topic} ")
         self.logger.debug('Send to: ' + topic)
         self.logger.debug(json.dumps(message, indent=2))
         encoded_message = json.dumps(message).encode('utf-8')
@@ -223,10 +223,15 @@ class Communication:
         start = ((start_x, start_y), start_direction)
         end = ((end_x, end_y), end_direction)
         weight = (-1) if payload["payload"]["pathStatus"] == "blocked" else payload["payload"]["pathWeight"]
+        print(f'Path received from the Server: {start}, {end}')
         self.explorer.add_path_intern(start, end, weight)
+        start_position = (start_x, start_y)
         if weight == -1:
-            if (start_x, start_y) in self.explorer.unknown_paths.keys():
+            if start_position in self.explorer.unknown_paths.keys():
                 self.explorer.unknown_paths[(start_x, start_y)].remove(start_direction)
+        if start_position not in self.explorer.unknown_paths.keys():
+            if weight != -1:
+                self.explorer.unknown_paths[start_position] = [start_direction]
 
     def process_done_payload(self, payload):
         if payload["type"] == "done":

@@ -55,7 +55,7 @@ class ExplorationManager:
 
     # I have written it on Nico's laptop
     def update_unknown_paths(self):
-        # print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
             # print("length is 0. return from update_unknown_paths")
             return
@@ -76,29 +76,29 @@ class ExplorationManager:
                 unknown_paths_content.append(direction)
         # If we get a path with pathUnveiled, we know that it is there
         # but we don't know if it doesn't have any unexplored paths at the second end
-        for direction in self.known_but_not_visited(self.current_position):
-            unknown_paths_content.append(direction)
-        for direction in self.directions_to_be_deleted:
-            if direction in unknown_paths_content:
-                unknown_paths_content.remove(direction)
-        self.directions_to_be_deleted.clear()
+        # for direction in self.known_but_not_visited(self.current_position):
+        #     unknown_paths_content.append(direction)
+        # for direction in self.directions_to_be_deleted:
+        #     if direction in unknown_paths_content:
+        #         unknown_paths_content.remove(direction)
+        # self.directions_to_be_deleted.clear()
         if len(unknown_paths_content) > 0:
-            self.unknown_paths[position] = unknown_paths_content
+            self.unknown_paths[position] = list(set(unknown_paths_content))
         self.unknown_paths_temp.clear()
         # print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
 
-    def known_but_not_visited(self, position):
-        known_but_not_visited_list = []
-        inner_dict = self.planet.get_paths()[position]
-        for direction in inner_dict:
-            if inner_dict[direction][0] not in self.visited_vertices and inner_dict[direction][2] != -1:
-                known_but_not_visited_list.append(direction)
-            if inner_dict[direction][2] == -1:
-                self.directions_to_be_deleted.append(direction)
-        return known_but_not_visited_list
+    # def known_but_not_visited(self, position):
+    #     known_but_not_visited_list = []
+    #     inner_dict = self.planet.get_paths()[position]
+    #     for direction in inner_dict:
+    #         if inner_dict[direction][0] not in self.visited_vertices and inner_dict[direction][2] != -1:
+    #             known_but_not_visited_list.append(direction)
+    #         if inner_dict[direction][2] == -1:
+    #             self.directions_to_be_deleted.append(direction)
+    #     return known_but_not_visited_list
 
     def set_target(self, target: Tuple[int, int]):
         if target == self.target:
@@ -131,7 +131,7 @@ class ExplorationManager:
         # Quick fix: It will be useful to track visited vertices for optimization purposes
         # We need it because otherwise we wouldn't be able to differentiate the paths discovered by
         # the robot from the paths received from the server with the pathUnveiled message
-        self.visited_vertices.add(current_position)
+        # self.visited_vertices.add(current_position)
         # The scanned paths will be added to the dict only after validation of the data by the server
         # That is, after the path message arrived.
         # So, the right way of doing it is push_scanning_results -> send_path_message
@@ -151,6 +151,7 @@ class ExplorationManager:
         self.search_path_found_weight = float('inf')
         self.update_current_position(current_position)
         self.update_current_orientation(current_orientation)
+        # print(f'UPDATE: orientation: {self.current_orientation}/{current_orientation}, position: {self.current_position}/{current_position}')
 
     # A simple method used to unify two lists into one without any repetitions nor any data losses
     def list_union_no_repetitions(self, list1, list2):
@@ -270,6 +271,7 @@ class ExplorationManager:
                         target: Tuple[Tuple[int, int], int],
                         weight: int):
         self.planet.add_path(start, target, weight)
+        # print(f'Current Paths: {self.planet.get_paths()}')
 
     # it returns a direction for exploration
     def explore(self, position: Tuple[int, int]):

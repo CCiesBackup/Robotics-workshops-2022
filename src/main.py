@@ -70,6 +70,7 @@ def run():
     unknown_paths_absolute = odometer.getDirections()
     # pushen
     explorer.push_scanning_results(unknown_paths_absolute, ready=True)
+    explorer.push_scanning_results(odometer.getDirections())
     direction = explorer.get_directions()
     communication.send_path_select(explorer.current_position[0], explorer.current_position[1], direction)
     # time.sleep(3)
@@ -85,20 +86,26 @@ def run():
         coordinates = odometer.getTarget()
         if odometer.somethingInWay:
             path_status = 'blocked'
-        if not explorer.did_I_visit_this_vertex(coordinates):
-            odometer.findPath()
-            explorer.push_scanning_results(odometer.getDirections())
+            coordinates = explorer.current_position
+            absolute_direction = direction
         communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0],
                                 coordinates[1], absolute_direction, path_status)
-        # time.sleep(4)
+        time.sleep(4)
         odometer.setCoordinates(explorer.current_position)
-        odometer.setCurrentDirection(explorer.current_orientation)
-        print(f'Korrigierte Koordinaten: {odometer.coordinates}')
-        print(f'Korrigierte Direction: {odometer.currentDirection}')
+        tempDirection = explorer.current_orientation
+        # if path_status == 'blocked':
+        #     tempDirection = explorer.get_reverse_direction(tempDirection)
+        odometer.setCurrentDirection(tempDirection)
+        if not explorer.did_I_visit_this_vertex(odometer.coordinates) and not explorer.target_set:
+            odometer.findPath()
+            explorer.push_scanning_results(odometer.getDirections())
+        explorer.visited_vertices.add(explorer.current_position)
+        time.sleep(2)
+        explorer.update_unknown_paths()
         direction = explorer.get_directions()
         if not direction == 128:
             communication.send_path_select(odometer.coordinates[0], odometer.coordinates[1], direction)
-            # time.sleep(4)
+            time.sleep(2)
             direction = explorer.get_directions(path_select_check=True)
         
     # schönerer Beepsound
