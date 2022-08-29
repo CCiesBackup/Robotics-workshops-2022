@@ -1,4 +1,5 @@
 import random
+import time
 from typing import Tuple
 
 import ShortestPathAbstract
@@ -55,7 +56,7 @@ class ExplorationManager:
         return vertex in self.visited_vertices
 
     def update_unknown_paths(self):
-        print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        #print(f"Before the update: temp: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
         if len(self.unknown_paths_temp) == 0:
             # print("length is 0. return from update_unknown_paths")
             return
@@ -86,7 +87,7 @@ class ExplorationManager:
         if len(unknown_paths_content) > 0:
             self.unknown_paths[position] = list(set(unknown_paths_content))
         self.unknown_paths_temp.clear()
-        # print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
+        print(f"After the update: {self.unknown_paths_temp}, norm: {self.unknown_paths}")
 
     # the method used for setting a target, it is also called by the communication class
     # after receiving a target message from the server
@@ -101,11 +102,7 @@ class ExplorationManager:
         # print(f"New target set! : {target}")
         self.target_set = True
         self.target = target
-        self.shortest_path = self.planet.shortest_path(self.current_position, target)
-        # If no way has been found, we will just continue the exploration
-        if self.shortest_path is None:
-            self.target_set = False
-        self.path_changed = False
+
 
     # this method is used to provide this class with the data regarding the unknown paths that
     # have been discovered by scanning the surroundings of a vertex with the color sensor
@@ -152,6 +149,7 @@ class ExplorationManager:
     # The method capsuling the logic of differentiating between the corresponding cases and
     # returning a single direction. It also manages the path select by server logic
     def __get_directions_intern(self):
+        time.sleep(2)
         if not self.path_select_set:
             position = self.current_position
 
@@ -159,6 +157,12 @@ class ExplorationManager:
                 # Here we get a direction from the exploration part
                 return self.explore(position)
             else:
+                if self.shortest_path is None:
+                    self.shortest_path = self.planet.shortest_path(self.current_position, self.target)
+                # If no way has been found, we will just continue the exploration
+                if self.shortest_path is None:
+                    self.target_set = False
+                self.path_changed = False
                 # Here we've got code for handling target-oriented navigation
                 # If path_unveiled disclosed some new information, recalculate the shortest path
                 # (a part of the previous shortest path could be blocked or there could be a better
@@ -250,6 +254,7 @@ class ExplorationManager:
         # it signals the need to relaunch the shortest way algorithm
         # if a pathUnveiled message has been received
         self.path_changed = True
+        self.shortest_path = None
         self.calculated_directions_to_next_neighbour_with_unknown_nodes = False
 
     # if we believe that we've completed the exploration, but it apparently hasn't been the case

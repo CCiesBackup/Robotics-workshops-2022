@@ -54,7 +54,7 @@ def run():
 
     # while loop mit Austauschbaren Verhalten
     # TEST ONlY - BITTE VOR DER PRÜFUNG ENTFERNEN!!!
-    test_planet_name = "Schoko"
+    test_planet_name = "John"
     communication.send_test_planet(test_planet_name)
     odometer = Odometry(0, (0, 0))
     # zum ersten Punkt fahren
@@ -96,6 +96,7 @@ def run():
         # if path_status == 'blocked':
         #     tempDirection = explorer.get_reverse_direction(tempDirection)
         odometer.setCurrentDirection(tempDirection)
+        print(f"Odometer directions: {odometer.getDirections()}")
         if not explorer.did_I_visit_this_vertex(odometer.coordinates) and not explorer.target_set:
             odometer.findPath()
             explorer.push_scanning_results(odometer.getDirections())

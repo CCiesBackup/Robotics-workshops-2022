@@ -105,7 +105,8 @@ class Communication:
         self.logger.debug(json.dumps(message, indent=2))
         encoded_message = json.dumps(message).encode('utf-8')
         self.client.publish(topic, payload=encoded_message, qos=2, retain=False)
-        time.sleep(3)
+        # We didn't receive all of the messages before, so it's necessary to set it at atleast 4
+        time.sleep(4)
 
     def send_ready(self):
         self.send_message(self.topics['general'], self.msg_models.ready())

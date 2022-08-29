@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Dict
 
@@ -39,11 +40,12 @@ class DijkstraAlgorithm(ShortestPathAbstract):
     # intern dictionary?
     # treat negative values
     def find_shortest_path(self, start, target) -> List[Tuple[Tuple[int, int], int]]:
-
+        print(f"Calculating the shortest path from {start} to {target}")
         self.path_data[start] = (True, 0, None)
         # print(f"Calculating the shortest path from {start} to {target}")
         # not checking for the start vertex for the sake of reducing the comparison amount
         if target not in self.paths.keys():
+            print("target not in self.paths.keys!")
             return None
 
         target_found = False
@@ -59,8 +61,10 @@ class DijkstraAlgorithm(ShortestPathAbstract):
                 break
 
         if not target_found:
+            print("No path has been found!")
             return None
         else:
+            print("a path has been found!")
             return self.__backtrace(target)
 
     def __choose_next_vertex(self, current_vertex):
