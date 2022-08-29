@@ -28,19 +28,16 @@ class Farbsensor:
 
     def isBlue(self, red, green, blue):
         if red <= (self.blue[0] + 10) and self.isBetween(green, self.blue[1]) and self.isBetween(blue, self.blue[2]) :
-            print('Is blue!')
             return True
         return False
     
     def isRed(self, red, green, blue):
         if self.isBetween(red, self.red[0]) and green <= (self.red[1] + 20) and blue <= (self.red[2] + 20):
-            print('Is red!')
             return True
         return False
     
     def isYellow(self, red, green, blue):
         if self.isBetween(red, self.yellow[0]) and self.isBetween(green, self.yellow[1])  and self.isBetween(blue, self.yellow[2]) :
-            print('Is red!')
             return True
         return False
     

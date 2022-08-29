@@ -17,6 +17,17 @@ class DijkstraAlgorithm(ShortestPathAbstract):
     path_data = {}
 
     def __init__(self, paths):
+        to_be_deleted = []
+        paths
+        for node in paths:
+            inner_dict = paths[node]
+            for direct in inner_dict:
+                weight = inner_dict[direct][2]
+                if weight == -1:
+                    to_be_deleted.append((node, direct))
+        # avoiding runtime error with the list
+        for position in to_be_deleted:
+            paths[position[0]].pop(position[1])
         self.paths = paths
         for node in paths:
             self.path_data[node] = [False, float('inf'), None]
@@ -28,7 +39,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
     def find_shortest_path(self, start, target) -> List[Tuple[Tuple[int, int], int]]:
 
         self.path_data[start] = (True, 0, None)
-        print(f"Calculating the shortest path from {start} to {target}")
+        # print(f"Calculating the shortest path from {start} to {target}")
         # not checking for the start vertex for the sake of reducing the comparison amount
         if target not in self.paths.keys():
             return None
@@ -67,6 +78,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
             # here I need to cut off the start
             previous_vertex = self.__get_previous_vertex(vertex)
             input_vertex = vertex
+            # make here insert 0 and avoid reversing it in the return
             response.append((input_vertex, input_direction))
             input_direction = self.__find_previous_vertex_direction(vertex)
             vertex = self.__get_previous_vertex(vertex)
@@ -136,7 +148,7 @@ class DijkstraAlgorithm(ShortestPathAbstract):
 
 
 class ShortestPathUsingC(ShortestPathAbstract):
-    # C (Yes, the programming language) will most likely be about 45 times faster
+    # The C programming language will most likely be about 45 times faster
     # at processing the data than Python. If the time allows it, I want definitely
     # to try writing the shortest path calculation subroutine in C and then executing it from Python
     def find_shortest_path(self, start, target, paths) -> List[Tuple[Tuple[int, int], int]]:

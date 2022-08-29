@@ -7,4 +7,4 @@ class Schallsensor:
         self.us.mode = "US-DIST-CM"
     
     def isSomethingInMyWay(self):
-        return self.us.value() <= 100
+        return self.us.value() <= 150

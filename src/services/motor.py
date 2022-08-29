@@ -10,16 +10,16 @@ class Motor(object):
     right = ev3.LargeMotor("outD")
     
     tp = 250
-    kp = 400
+    kp = 450
     offset = 0.5
     error = 0
     lastError = 0
     turn = 0
-    ki = 10
-    kd = 400
+    ki = 12
+    kd = 450
     integral = 0
     derivative = 0
-    ninety = 442
+    ninety = 450
     valueRangeBlack = 0
     valueRangeWhite = 0
     
@@ -28,13 +28,21 @@ class Motor(object):
         self.left.reset()
         self.right.reset()
         
-        self.left.stop_action = "brake"
-        self.right.stop_action = "brake"
+        self.left.stop_action = "hold"
+        self.right.stop_action = "hold"
         
         self.setCommand("run-forever")
     
+    def driveBack(self):
+        self.setPositionSP(-(self.seven / 7 * 2))
+        
+        self.setspeed(-self.tp, -self.tp)
+        
+        self.setCommand("run-to-rel-pos")
+        
+        time.sleep(self.sleepTimer)
+    
     def driveSevenCM(self):
-        print('Fahre 7cm')
         self.setPositionSP(self.seven)
         
         self.setspeed(self.tp, self.tp)
@@ -44,8 +52,12 @@ class Motor(object):
         time.sleep(self.sleepTimer)
     
     def turnRight(self):
-        print('Drehe nach rechts')
         self.curve(self.ninety)
+    
+    def turnLeft(self):
+        self.setPositionSP(self.ninety)
+        self.setspeed(-500, 500)
+        self.setCommand("run-to-rel-pos")
     
     def driveLine(self, lightValue):
         self.error = lightValue - self.offset
@@ -85,10 +97,6 @@ class Motor(object):
         self.left.position_sp = position
         self.right.position_sp = position
     
-    def driveToDirection(self, currentDirection, destination):
-        temp = ((destination - currentDirection) / 90) * self.ninety
-        self.curve(temp)
-    
     def curve(self, position):
         self.left.position_sp = -position
         self.right.position_sp = position
@@ -99,4 +107,11 @@ class Motor(object):
     def setOffset(self, black, white):
         self.valueRangeBlack = black - self.offset
         self.valueRangeWhite = white - self.offset
-        print(f'Offset: {self.offset}, Range: {self.valueRangeBlack}, {self.valueRangeWhite}')
+    
+    def reset(self):
+        self.left.reset()
+        self.right.reset()
+        
+        self.left.stop_action = "hold"
+        self.right.stop_action = "hold"
+

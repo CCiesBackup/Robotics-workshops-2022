@@ -47,16 +47,63 @@ def run():
     # THE EXECUTION OF ALL CODE SHALL BE STARTED FROM WITHIN THIS FUNCTION.
     # ADD YOUR OWN IMPLEMENTATION HEREAFTER.
 
-
-    # communication = CommunicationFactory.getInstance(logger)
+    explorer = ExplorationManager()
+    communication = CommunicationFactory.getInstance(client, logger, explorer)
     # Be careful: Initializing the communication module establishes a real connection to the server!
 
 
     # while loop mit Austauschbaren Verhalten
-    test = Odometry(0,(0,0))
-    test.driving()
-        
+    # TEST ONlY - BITTE VOR DER PRÜFUNG ENTFERNEN!!!
+    test_planet_name = "Schoko"
+    communication.send_test_planet(test_planet_name)
+    odometer = Odometry(0, (0, 0))
+    # zum ersten Punkt fahren
+    odometer.driving()
+    # Paths scannen
+    odometer.findPath()
+    # ready zum Muterschiff
+    communication.send_ready()
+    time.sleep(3)
+    # Koordinaten, Blickrichtung setzen
+    odometer.setCoordinates(explorer.current_position)
+    odometer.setCurrentDirection(explorer.current_orientation)
+    unknown_paths_absolute = odometer.getDirections()
+    # pushen
+    explorer.push_scanning_results(unknown_paths_absolute, ready=True)
+    direction = explorer.get_directions()
+    communication.send_path_select(explorer.current_position[0], explorer.current_position[1], direction)
+    # time.sleep(3)
+    direction = explorer.get_directions(path_select_check=True)
 
+    while not direction == 128:
+        path_status = 'free'
+        ev3.Sound.beep()
+        odometer.turnRelative(direction)
+        time.sleep(1)
+        odometer.driving()
+        absolute_direction = explorer.get_reverse_direction(odometer.getDirection())
+        coordinates = odometer.getTarget()
+        if odometer.somethingInWay:
+            path_status = 'blocked'
+        if not explorer.did_I_visit_this_vertex(coordinates):
+            odometer.findPath()
+            explorer.push_scanning_results(odometer.getDirections())
+        communication.send_path(explorer.current_position[0], explorer.current_position[1], direction, coordinates[0],
+                                coordinates[1], absolute_direction, path_status)
+        # time.sleep(4)
+        odometer.setCoordinates(explorer.current_position)
+        odometer.setCurrentDirection(explorer.current_orientation)
+        print(f'Korrigierte Koordinaten: {odometer.coordinates}')
+        print(f'Korrigierte Direction: {odometer.currentDirection}')
+        direction = explorer.get_directions()
+        if not direction == 128:
+            communication.send_path_select(odometer.coordinates[0], odometer.coordinates[1], direction)
+            # time.sleep(4)
+            direction = explorer.get_directions(path_select_check=True)
+        
+    # schönerer Beepsound
+    # ev3.Sound.beep()
+    ev3.Sound.speak('Planet has been successfully captured.').wait()
     print("RIP")
 
 
