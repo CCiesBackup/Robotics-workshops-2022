@@ -57,15 +57,15 @@ class Odometry:
         # time.sleep(1)
         # red = self.calibration('Rot')
         # time.sleep(1)
-        # white = self.calibration('Weiß')
-        # time.sleep(1)
-        # black = self.calibration('Schwarz')
+        white = self.calibration('Weiß')
+        time.sleep(1)
+        black = self.calibration('Schwarz')
         # time.sleep(1)
         # yellow = self.calibration('Gelb')
         red = (112, 31, 20)
         blue = (27, 97, 81)
-        white = (163, 240, 147)
-        black = (23, 34, 19)
+        # white = (163, 240, 147)
+        # black = (23, 34, 19)
         yellow = (108, 113, 21)
         self.farbsensor.setColors(black, blue, red, yellow)
         self.motor.setOffset(self.farbsensor.convert(black), self.farbsensor.convert(white))
@@ -74,7 +74,7 @@ class Odometry:
         print('Setzten Sie jetzt den Roboter an den gewünschten Punkt und drücken Sie eine Taste auf dem Roboter.')
         self.stealTime()
 
-    def getdirection(self):
+    def getDirection(self):
         alpha = self.radians / (2 * math.pi) * 360
         return (self.roundToNinety(alpha) + self.currentDirection) % 360
     
@@ -85,6 +85,7 @@ class Odometry:
             if self.ultrasonic.isSomethingInMyWay():
                 ev3.Sound.play('/home/robot/src/assets/quack.wav')
                 self.somethingInWay = True
+                self.motor.driveBack()
                 self.turnAround()
             
             color = self.farbsensor.recognizeColour()
@@ -115,7 +116,12 @@ class Odometry:
         return
     
     def turnAround(self):
-        self.motor.curve(self.motor.ninety * 2)
+        temp = 0
+        if self.roundToNinety(self.getdirection()) == 90:
+            temp = 30
+        if self.getdirection() == -90:
+            temp = -20
+        self.motor.curve(self.motor.ninety * 2 + temp)
         time.sleep(2.25)
         
     def driveAtPoint(self):
@@ -125,6 +131,7 @@ class Odometry:
         ev3.Sound.beep()
         
         # calc Data
+        self.radians = 0
         list(map(self.setCalculatedData, self.data))
         self.destination = (round(self.destination[0]), round(self.destination[1]))
         self.destination = (self.destination[0] / 50, self.destination[1] / 50)
@@ -133,6 +140,7 @@ class Odometry:
     def driveLine(self, lightValue):
         temp = self.motor.driveLine(lightValue)
         distTupel = self.getLocalDegree(temp[0], temp[1])
+        self.radians += self.calcDirection(distTupel[0], distTupel[1])
         self.data.append(distTupel)
     
     def getLocalDegree(self, left, right):

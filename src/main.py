@@ -86,7 +86,7 @@ def run():
         if not direction == 128:
             communication.send_path_select(coordinates[0], coordinates[1], direction)
         
-
+    ev3.Sound.beep()
     print("RIP")
 
 

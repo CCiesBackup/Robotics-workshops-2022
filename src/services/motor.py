@@ -10,16 +10,16 @@ class Motor(object):
     right = ev3.LargeMotor("outD")
     
     tp = 250
-    kp = 400
+    kp = 450
     offset = 0.5
     error = 0
     lastError = 0
     turn = 0
-    ki = 10
-    kd = 400
+    ki = 12
+    kd = 450
     integral = 0
     derivative = 0
-    ninety = 442
+    ninety = 450
     valueRangeBlack = 0
     valueRangeWhite = 0
     
@@ -33,8 +33,16 @@ class Motor(object):
         
         self.setCommand("run-forever")
     
+    def driveBack(self):
+        self.setPositionSP(-(self.seven / 7 * 2))
+        
+        self.setspeed(-self.tp, -self.tp)
+        
+        self.setCommand("run-to-rel-pos")
+        
+        time.sleep(self.sleepTimer)
+    
     def driveSevenCM(self):
-        print('Fahre 7cm')
         self.setPositionSP(self.seven)
         
         self.setspeed(self.tp, self.tp)
@@ -44,7 +52,6 @@ class Motor(object):
         time.sleep(self.sleepTimer)
     
     def turnRight(self):
-        print('Drehe nach rechts')
         self.curve(self.ninety)
     
     def driveLine(self, lightValue):
@@ -99,4 +106,3 @@ class Motor(object):
     def setOffset(self, black, white):
         self.valueRangeBlack = black - self.offset
         self.valueRangeWhite = white - self.offset
-        print(f'Offset: {self.offset}, Range: {self.valueRangeBlack}, {self.valueRangeWhite}')
